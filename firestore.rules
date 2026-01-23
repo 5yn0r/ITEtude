@@ -34,7 +34,7 @@ service cloud.firestore {
     // This rule allows an admin to read any progress document, which is necessary
     // for collection group queries used in the admin dashboard.
     match /{path=**}/progress/{resourceId} {
-      allow read: if request.auth != null && isAdmin();
+      allow read: if isAdmin();
     }
     
     match /feedback/{feedbackId} {
