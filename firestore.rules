@@ -26,9 +26,15 @@ service cloud.firestore {
       allow write: if request.auth != null && isAdmin();
     }
 
+    // This rule allows a user to read and write to their own progress documents.
     match /users/{userId}/progress/{resourceId} {
-      allow read: if request.auth.uid == userId || isAdmin();
-      allow write: if request.auth.uid == userId;
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    // This rule allows an admin to read any progress document, which is necessary
+    // for collection group queries used in the admin dashboard.
+    match /{path=**}/progress/{resourceId} {
+      allow read: if request.auth != null && isAdmin();
     }
     
     match /feedback/{feedbackId} {
