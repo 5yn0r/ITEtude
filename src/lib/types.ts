@@ -50,7 +50,7 @@ export type UserProfile = {
 
 export type UserProgress = {
   id: string; // This will be the resourceId
-  userId: string;
+  userId?: string;
   status: ProgressStatus;
   isFavorite: boolean;
 };
