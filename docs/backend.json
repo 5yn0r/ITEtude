@@ -1,0 +1,267 @@
+{
+  "entities": {
+    "Admin": {
+      "title": "Administrator",
+      "description": "Represents an administrator of the application. The existence of a document with the user's UID in the /admins collection grants admin rights. The document itself can be empty.",
+      "type": "object",
+      "properties": {}
+    },
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's profile information.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "The user's unique ID."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "photoURL": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the user's profile picture."
+        },
+        "hiddenPaths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "An array of learning path IDs that the user has hidden from their dashboard."
+        }
+      },
+      "required": [
+        "uid",
+        "email"
+      ]
+    },
+    "Resource": {
+      "title": "Resource",
+      "description": "Represents a learning resource.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "number"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "Débutant",
+            "Intermédiaire",
+            "Avancé"
+          ]
+        },
+        "dataWeight": {
+          "type": "string",
+          "enum": [
+            "Plume",
+            "Standard",
+            "Media",
+            "Flux"
+          ]
+        },
+        "language": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "url",
+        "categoryId",
+        "difficulty",
+        "dataWeight",
+        "language"
+      ]
+    },
+    "LearningPath": {
+      "title": "Learning Path",
+      "description": "Represents a curated learning path.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "number"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "Débutant",
+            "Intermédiaire",
+            "Avancé"
+          ]
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order": {
+                "type": "number"
+              },
+              "resourceId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "order",
+              "resourceId"
+            ]
+          }
+        }
+      },
+      "required": [
+        "title",
+        "categoryId",
+        "difficulty",
+        "steps"
+      ]
+    },
+    "UserProgress": {
+      "title": "User Progress",
+      "description": "Tracks a user's progress on a resource.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "non commencé",
+            "en cours",
+            "terminé"
+          ]
+        },
+        "isFavorite": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "status",
+        "isFavorite"
+      ]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "Represents user feedback or a reported issue.",
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Problème Technique",
+            "Suggestion",
+            "Problème de ressource",
+            "Autre"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Nouveau",
+            "En cours",
+            "Résolu"
+          ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "userName": {
+          "type": "string"
+        },
+        "resourceId": {
+          "type": "string"
+        },
+        "resourceTitle": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "message",
+        "status",
+        "createdAt",
+        "userId",
+        "userEmail",
+        "userName"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "google.com",
+      "password"
+    ]
+  },
+  "firestore": {
+    "/admins/{userId}": {
+      "schema": {
+        "$ref": "#/entities/Admin"
+      },
+      "description": "Stores the list of administrator UIDs. The existence of a document grants admin rights."
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores public information for each user."
+    },
+    "/resources": {
+      "schema": {
+        "$ref": "#/entities/Resource"
+      },
+      "description": "Collection of all learning resources."
+    },
+    "/learningPaths": {
+      "schema": {
+        "$ref": "#/entities/LearningPath"
+      },
+      "description": "Collection of all learning paths."
+    },
+    "/users/{userId}/progress": {
+      "schema": {
+        "$ref": "#/entities/UserProgress"
+      },
+      "description": "Sub-collection for user-specific progress and favorites. The document ID is the resourceId."
+    },
+    "/feedback": {
+      "schema": {
+        "$ref": "#/entities/Feedback"
+      },
+      "description": "Collection of all user feedback."
+    }
+  }
+}
