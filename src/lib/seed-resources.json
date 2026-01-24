@@ -1,0 +1,63 @@
+
+[
+  {
+    "title": "Apprendre le HTML de A à Z",
+    "url": "https://grafikart.fr/formations/html",
+    "description": "Une formation vidéo complète pour apprendre le langage HTML, la base de toute page web. Idéal pour les débutants.",
+    "categoryId": 1,
+    "difficulty": "Débutant",
+    "dataWeight": "Flux",
+    "language": "Français",
+    "author": "Grafikart"
+  },
+  {
+    "title": "Le Guide JavaScript",
+    "url": "https://developer.mozilla.org/fr/docs/Web/JavaScript/Guide",
+    "description": "La documentation de référence pour le langage JavaScript. Exhaustive et précise, c'est une ressource incontournable.",
+    "categoryId": 1,
+    "difficulty": "Intermédiaire",
+    "dataWeight": "Standard",
+    "language": "Français",
+    "author": "MDN Web Docs"
+  },
+  {
+    "title": "La cybersécurité pour les TPE/PME en 13 questions",
+    "url": "https://www.ssi.gouv.fr/guide/la-cybersecurite-pour-les-tpe-pme-en-treize-questions/",
+    "description": "Un guide pratique de l'ANSSI pour comprendre les bases de la cybersécurité.",
+    "categoryId": 2,
+    "difficulty": "Débutant",
+    "dataWeight": "Plume",
+    "language": "Français",
+    "author": "ANSSI"
+  },
+  {
+    "title": "100+ Computer Science Concepts Explained",
+    "url": "https://www.youtube.com/watch?v=zOjov-2OZ0E",
+    "description": "Une vidéo ultra-rapide qui couvre plus de 100 concepts fondamentaux en informatique. Parfait pour une vue d'ensemble.",
+    "categoryId": 1,
+    "difficulty": "Intermédiaire",
+    "dataWeight": "Flux",
+    "language": "Anglais",
+    "author": "Fireship"
+  },
+  {
+    "title": "La liste complète des outils d'IA (mise à jour)",
+    "url": "https://www.blogdumoderateur.com/outils-ia-liste-complete/",
+    "description": "Un article très complet qui liste et catégorise un grand nombre d'outils basés sur l'intelligence artificielle.",
+    "categoryId": 3,
+    "difficulty": "Débutant",
+    "dataWeight": "Media",
+    "language": "Français",
+    "author": "Blog du Modérateur"
+  },
+  {
+    "title": "Comment fonctionne Internet ?",
+    "url": "https://lehollandaisvolant.net/tout/howto-internet/",
+    "description": "Un article de vulgarisation qui explique de manière simple et imagée les concepts de base d'Internet : DNS, IP, TCP, etc.",
+    "categoryId": 4,
+    "difficulty": "Débutant",
+    "dataWeight": "Standard",
+    "language": "Français",
+    "author": "Le Hollandais Volant"
+  }
+]
