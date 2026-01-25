@@ -26,7 +26,7 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
 
   return (
     <div className="p-0 bg-card">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-1">
         <div>
           <Label htmlFor="difficulty-select" className="sr-only">Niveau</Label>
           <Select onValueChange={handleDifficultyChange} defaultValue="all">
