@@ -126,7 +126,7 @@ export default function LearningPathDetailPage({ params }: { params: { id: strin
         />
       )}
       <AppHeader title="Parcours d'Apprentissage" />
-      <main className="flex-1 p-4 md:p-6 lg:p-8 bg-secondary/50">
+      <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-2">
