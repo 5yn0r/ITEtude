@@ -6,7 +6,6 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label";
-import { Filter } from "lucide-react";
 
 type FilterControlsProps = {
   onFilterChange: (filters: { difficulty: string; dataWeight: string; language: string; }) => void;
@@ -26,17 +25,13 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
   };
 
   return (
-    <div className="p-2 sm:p-3 bg-card rounded-lg border shadow-sm">
-      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-        <Filter className="w-4 h-4" />
-        <h3 className="text-sm sm:text-base font-semibold">Filtres</h3>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+    <div className="p-0 bg-card">
+      <div className="grid grid-cols-3 gap-2">
         <div>
-          <Label htmlFor="difficulty-select" className="text-xs sm:text-sm">Niveau</Label>
+          <Label htmlFor="difficulty-select" className="sr-only">Niveau</Label>
           <Select onValueChange={handleDifficultyChange} defaultValue="all">
-            <SelectTrigger id="difficulty-select" className="h-9">
-              <SelectValue placeholder="Tous les niveaux" />
+            <SelectTrigger id="difficulty-select" className="h-8 text-xs">
+              <SelectValue placeholder="Niveau" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les niveaux</SelectItem>
@@ -48,10 +43,10 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
         </div>
 
         <div>
-          <Label htmlFor="data-weight-select" className="text-xs sm:text-sm">Poids Data</Label>
+          <Label htmlFor="data-weight-select" className="sr-only">Poids Data</Label>
           <Select onValueChange={handleDataWeightChange} defaultValue="all">
-            <SelectTrigger id="data-weight-select" className="h-9">
-              <SelectValue placeholder="Tous les poids" />
+            <SelectTrigger id="data-weight-select" className="h-8 text-xs">
+              <SelectValue placeholder="Poids" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Tous les poids</SelectItem>
@@ -64,10 +59,10 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
         </div>
 
         <div>
-          <Label htmlFor="language-select" className="text-xs sm:text-sm">Langue</Label>
+          <Label htmlFor="language-select" className="sr-only">Langue</Label>
           <Select onValueChange={handleLanguageChange} defaultValue="all">
-            <SelectTrigger id="language-select" className="h-9">
-              <SelectValue placeholder="Toutes les langues" />
+            <SelectTrigger id="language-select" className="h-8 text-xs">
+              <SelectValue placeholder="Langue" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Toutes les langues</SelectItem>
