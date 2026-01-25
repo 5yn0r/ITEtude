@@ -42,7 +42,7 @@ export default function AppLayout({
 
   if (loading || !user) {
     return (
-      <div className="grid h-screen w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="grid h-dvh w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <div className="hidden border-r bg-sidebar md:block">
             <div className="flex h-full max-h-screen flex-col gap-2 p-4">
                 <Skeleton className="h-8 w-32" />
@@ -74,7 +74,7 @@ export default function AppLayout({
 
   return (
     <FavoritesProvider>
-      <div className="grid h-screen w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <div className="grid h-dvh w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <AppSidebar className="hidden md:block border-r" />
         <div className="flex flex-col overflow-hidden">
           <div className="flex-1 flex flex-col min-h-0">
