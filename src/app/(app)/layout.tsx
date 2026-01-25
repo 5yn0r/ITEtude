@@ -77,7 +77,7 @@ export default function AppLayout({
       <div className="grid h-dvh w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
         <AppSidebar className="hidden md:block border-r" />
         <div className="flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex-1 flex flex-col min-h-0 bg-secondary/50">
              {children}
           </div>
           <AppFooter />
