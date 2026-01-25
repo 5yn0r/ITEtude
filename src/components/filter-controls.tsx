@@ -26,16 +26,16 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
   };
 
   return (
-    <div className="p-4 bg-card rounded-lg border shadow-sm">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="w-5 h-5" />
-        <h3 className="text-lg font-semibold">Filtres</h3>
+    <div className="p-3 bg-card rounded-lg border shadow-sm">
+      <div className="flex items-center gap-2 mb-3">
+        <Filter className="w-4 h-4" />
+        <h3 className="text-base font-semibold">Filtres</h3>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         <div>
           <Label htmlFor="difficulty-select">Niveau</Label>
           <Select onValueChange={handleDifficultyChange} defaultValue="all">
-            <SelectTrigger id="difficulty-select">
+            <SelectTrigger id="difficulty-select" className="h-9">
               <SelectValue placeholder="Tous les niveaux" />
             </SelectTrigger>
             <SelectContent>
@@ -50,7 +50,7 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
         <div>
           <Label htmlFor="data-weight-select">Poids Data</Label>
           <Select onValueChange={handleDataWeightChange} defaultValue="all">
-            <SelectTrigger id="data-weight-select">
+            <SelectTrigger id="data-weight-select" className="h-9">
               <SelectValue placeholder="Tous les poids" />
             </SelectTrigger>
             <SelectContent>
@@ -66,7 +66,7 @@ export function FilterControls({ onFilterChange }: FilterControlsProps) {
         <div>
           <Label htmlFor="language-select">Langue</Label>
           <Select onValueChange={handleLanguageChange} defaultValue="all">
-            <SelectTrigger id="language-select">
+            <SelectTrigger id="language-select" className="h-9">
               <SelectValue placeholder="Toutes les langues" />
             </SelectTrigger>
             <SelectContent>
