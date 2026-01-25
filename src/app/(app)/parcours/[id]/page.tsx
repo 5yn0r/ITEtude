@@ -173,27 +173,30 @@ export default function LearningPathDetailPage({ params }: { params: { id: strin
               const completed = isCompleted(resource.id);
               return (
                 <Card key={resource.id} className="transition-colors">
-                  <CardContent className="p-4 flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4">
-                    <button
-                      onClick={() => toggleResourceCompleted(resource.id)}
-                      className="p-2 rounded-full hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shrink-0"
-                      aria-label={`Marquer l'étape ${order} comme ${completed ? 'non terminée' : 'terminée'}`}
-                    >
-                      {completed ? (
-                        <CheckCircle2 className="w-8 h-8 text-green-500 shrink-0" />
-                      ) : (
-                        <Circle className="w-8 h-8 text-muted-foreground shrink-0" />
-                      )}
-                    </button>
-                    <div className="flex-grow w-full">
-                      <p className="text-sm text-muted-foreground">Étape {order}</p>
-                      <p className="font-semibold">{resource.title}</p>
-                      {resource.description && <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{resource.description}</p>}
-                      <div className="flex items-center justify-center sm:justify-start gap-2 text-sm text-muted-foreground mt-2">
-                        <span>{new URL(resource.url).hostname}</span>
-                        <Badge variant="outline" className="py-0">{resource.dataWeight}</Badge>
-                      </div>
+                  <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex flex-1 items-start gap-4">
+                        <button
+                            onClick={() => toggleResourceCompleted(resource.id)}
+                            className="p-1 rounded-full hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shrink-0 mt-1"
+                            aria-label={`Marquer l'étape ${order} comme ${completed ? 'non terminée' : 'terminée'}`}
+                        >
+                            {completed ? (
+                                <CheckCircle2 className="w-7 h-7 text-green-500 shrink-0" />
+                            ) : (
+                                <Circle className="w-7 h-7 text-muted-foreground shrink-0" />
+                            )}
+                        </button>
+                        <div className="flex-grow">
+                            <p className="text-sm text-muted-foreground">Étape {order}</p>
+                            <p className="font-semibold">{resource.title}</p>
+                            {resource.description && <p className="text-sm text-muted-foreground mt-1">{resource.description}</p>}
+                            <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mt-2">
+                                <span>{new URL(resource.url).hostname}</span>
+                                <Badge variant="outline" className="py-0">{resource.dataWeight}</Badge>
+                            </div>
+                        </div>
                     </div>
+
                     <Button asChild size="sm" className="shrink-0 w-full sm:w-auto">
                       <a href={resource.url} target="_blank" rel="noopener noreferrer">
                         Accéder
