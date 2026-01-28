@@ -43,7 +43,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
         <CardDescription>{new URL(resource.url).hostname}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="text-sm text-muted-foreground md:line-clamp-3">
           {resource.description || "Aucune description disponible."}
         </p>
       </CardContent>
