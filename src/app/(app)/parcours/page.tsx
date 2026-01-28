@@ -37,7 +37,7 @@ export default function LearningPathsPage() {
   return (
     <>
       <AppHeader title="Parcours d'Apprentissage" />
-      <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto">
+      <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto overscroll-y-contain">
         <div className="space-y-6">
           <div className="mb-8">
             <h2 className="text-3xl font-bold tracking-tight">Explorez nos parcours</h2>
@@ -66,3 +66,5 @@ export default function LearningPathsPage() {
     </>
   );
 }
+
+    

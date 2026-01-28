@@ -322,7 +322,7 @@ export default function AdminPage() {
     return (
       <>
         <AppHeader title="Tableau de bord Admin" />
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto overscroll-y-contain">
           <div className="space-y-8">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card><CardHeader><Skeleton className="h-4 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-12" /></CardContent></Card>
@@ -340,7 +340,7 @@ export default function AdminPage() {
   return (
     <>
       <AppHeader title="Tableau de bord Admin" />
-      <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto">
+      <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto overscroll-y-contain">
         <div className="space-y-8">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Utilisateurs</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{users.length}</div></CardContent></Card>
@@ -566,3 +566,5 @@ export default function AdminPage() {
     </>
   );
 }
+
+    
