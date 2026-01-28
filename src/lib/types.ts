@@ -48,6 +48,8 @@ export type Certification = {
   description?: string;
   categoryId: number;
   difficulty: Difficulty;
+  issuedAt?: any; // Firestore Timestamp
+  expiresAt?: any | null; // Firestore Timestamp or null
 };
 
 export type UserProfile = {

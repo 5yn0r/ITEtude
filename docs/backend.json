@@ -173,6 +173,19 @@
             "Intermédiaire",
             "Avancé"
           ]
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the certification was issued."
+        },
+        "expiresAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "The date the certification expires, or null if it does not expire."
         }
       },
       "required": [
