@@ -6,6 +6,10 @@ import { Providers } from './providers';
 export const metadata: Metadata = {
   title: "ITEtude",
   description: "Solution de curation intelligente transformant le chaos informationnel en parcours d'apprentissage structurés pour l'informatique francophone.",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({
