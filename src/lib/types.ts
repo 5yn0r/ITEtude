@@ -39,6 +39,17 @@ export type LearningPath = {
   difficulty: Difficulty;
 };
 
+export type Certification = {
+  id: string;
+  title: string;
+  issuingBody: string;
+  url: string;
+  logoUrl: string;
+  description?: string;
+  categoryId: number;
+  difficulty: Difficulty;
+};
+
 export type UserProfile = {
   id: string;
   uid: string;

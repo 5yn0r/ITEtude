@@ -141,6 +141,49 @@
         "steps"
       ]
     },
+    "Certification": {
+      "title": "Certification",
+      "description": "Represents an official IT certification.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "issuingBody": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "logoUrl": {
+          "type": "string",
+          "format": "uri"
+        },
+        "description": {
+          "type": "string"
+        },
+        "categoryId": {
+          "type": "number"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": [
+            "Débutant",
+            "Intermédiaire",
+            "Avancé"
+          ]
+        }
+      },
+      "required": [
+        "title",
+        "issuingBody",
+        "url",
+        "logoUrl",
+        "categoryId",
+        "difficulty"
+      ]
+    },
     "UserProgress": {
       "title": "User Progress",
       "description": "Tracks a user's progress on a resource.",
@@ -250,6 +293,12 @@
         "$ref": "#/entities/LearningPath"
       },
       "description": "Collection of all learning paths."
+    },
+    "/certifications": {
+      "schema": {
+        "$ref": "#/entities/Certification"
+      },
+      "description": "Collection of all IT certifications."
     },
     "/users/{userId}/progress": {
       "schema": {
