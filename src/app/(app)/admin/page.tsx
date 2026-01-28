@@ -4,8 +4,8 @@ import { AppHeader } from "@/components/app-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/lib/data";
-import type { Resource, LearningPath, LearningPathStep, Feedback, FeedbackStatus, UserProgress, UserProfile } from "@/lib/types";
-import { Milestone, BookOpen, PlusCircle, Pencil, Trash2, Heart, ArrowUpRight, Users, Loader2, ScanLine } from "lucide-react";
+import type { Resource, LearningPath, LearningPathStep, Feedback, FeedbackStatus, UserProgress, UserProfile, Certification } from "@/lib/types";
+import { Milestone, BookOpen, PlusCircle, Pencil, Trash2, Heart, ArrowUpRight, Users, Loader2, ScanLine, Award } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,6 +60,17 @@ const pathSchema = z.object({
   resourceIds: z.array(z.string()).min(1, "Veuillez sélectionner au moins une ressource."),
 });
 
+const certificationSchema = z.object({
+  title: z.string().min(3, "Le titre doit faire au moins 3 caractères."),
+  issuingBody: z.string().min(2, "Le nom de l'organisme est requis."),
+  url: z.string().url("Veuillez entrer une URL valide."),
+  logoUrl: z.string().url("Veuillez entrer une URL de logo valide."),
+  description: z.string().optional(),
+  categoryId: z.coerce.number(),
+  difficulty: z.enum(['Débutant', 'Intermédiaire', 'Avancé']),
+});
+
+
 const feedbackStatusStyles: Record<FeedbackStatus, string> = {
   'Nouveau': 'bg-red-100 text-red-800 border-red-200 font-semibold dark:bg-red-900/50 dark:text-red-300 dark:border-red-800',
   'En cours': 'bg-yellow-100 text-yellow-800 border-yellow-200 font-semibold dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-800',
@@ -69,6 +80,7 @@ const feedbackStatusStyles: Record<FeedbackStatus, string> = {
 export default function AdminPage() {
   const { data: resources, loading: resourcesLoading } = useCollection<Resource>('resources');
   const { data: learningPaths, loading: pathsLoading } = useCollection<LearningPath>('learningPaths');
+  const { data: certifications, loading: certificationsLoading } = useCollection<Certification>('certifications');
   const { data: feedbacks, loading: feedbacksLoading } = useCollection<Feedback>('feedback');
   const { data: allProgress, loading: progressLoading } = useCollectionGroup<UserProgress>('progress');
   const { data: users, loading: usersLoading } = useCollection<UserProfile>('users');
@@ -82,6 +94,8 @@ export default function AdminPage() {
   const [deletingResourceId, setDeletingResourceId] = useState<string | null>(null);
   const [editingPath, setEditingPath] = useState<LearningPath | null>(null);
   const [deletingPathId, setDeletingPathId] = useState<string | null>(null);
+  const [editingCertification, setEditingCertification] = useState<Certification | null>(null);
+  const [deletingCertificationId, setDeletingCertificationId] = useState<string | null>(null);
   const [viewingFeedback, setViewingFeedback] = useState<Feedback | null>(null);
   const [checkingLinkId, setCheckingLinkId] = useState<string | null>(null);
 
@@ -95,28 +109,18 @@ export default function AdminPage() {
     defaultValues: { title: "", description: "", difficulty: "Débutant", resourceIds: [] },
   });
 
-  const editResourceForm = useForm<z.infer<typeof resourceSchema>>({
-    resolver: zodResolver(resourceSchema),
+  const certificationForm = useForm<z.infer<typeof certificationSchema>>({
+    resolver: zodResolver(certificationSchema),
+    defaultValues: { title: "", issuingBody: "", url: "", logoUrl: "", description: "", difficulty: "Débutant" },
   });
 
-  const editPathForm = useForm<z.infer<typeof pathSchema>>({
-    resolver: zodResolver(pathSchema),
-  });
+  const editResourceForm = useForm<z.infer<typeof resourceSchema>>({ resolver: zodResolver(resourceSchema) });
+  const editPathForm = useForm<z.infer<typeof pathSchema>>({ resolver: zodResolver(pathSchema) });
+  const editCertificationForm = useForm<z.infer<typeof certificationSchema>>({ resolver: zodResolver(certificationSchema) });
 
-  useEffect(() => {
-    if (editingResource) {
-      editResourceForm.reset(editingResource);
-    }
-  }, [editingResource, editResourceForm]);
-
-  useEffect(() => {
-    if (editingPath) {
-      editPathForm.reset({
-        ...editingPath,
-        resourceIds: editingPath.steps.map(step => step.resourceId),
-      });
-    }
-  }, [editingPath, editPathForm]);
+  useEffect(() => { if (editingResource) { editResourceForm.reset(editingResource); } }, [editingResource, editResourceForm]);
+  useEffect(() => { if (editingPath) { editPathForm.reset({ ...editingPath, resourceIds: editingPath.steps.map(step => step.resourceId) }); } }, [editingPath, editPathForm]);
+  useEffect(() => { if (editingCertification) { editCertificationForm.reset(editingCertification); } }, [editingCertification, editCertificationForm]);
   
   const likesPerResource = useMemo(() => {
     if (!allProgress) return new Map<string, number>();
@@ -135,10 +139,7 @@ export default function AdminPage() {
   }, [allProgress]);
 
   const completionsPerPath = useMemo(() => {
-    if (!allProgress || !learningPaths) {
-      return new Map<string, number>();
-    }
-
+    if (!allProgress || !learningPaths) return new Map<string, number>();
     const completedResourcesByUser = new Map<string, Set<string>>();
     allProgress.forEach(p => {
       if (p.status === 'terminé' && p.userId) {
@@ -148,209 +149,170 @@ export default function AdminPage() {
         completedResourcesByUser.get(p.userId)!.add(p.id);
       }
     });
-
     const completions = new Map<string, number>();
-
     learningPaths.forEach(path => {
       if (path.steps.length === 0) {
         completions.set(path.id, 0);
         return;
       }
-
       const requiredResourceIds = new Set(path.steps.map(step => step.resourceId));
       let pathCompletions = 0;
-
       for (const [userId, userCompletedSet] of completedResourcesByUser.entries()) {
         const hasCompletedPath = [...requiredResourceIds].every(requiredId => userCompletedSet.has(requiredId));
-        
-        if (hasCompletedPath) {
-          pathCompletions++;
-        }
+        if (hasCompletedPath) pathCompletions++;
       }
       completions.set(path.id, pathCompletions);
     });
-
     return completions;
   }, [allProgress, learningPaths]);
 
 
   async function handleCheckLink(resource: Resource) {
-    if (!user || !firestore) {
-      toast({
-        variant: 'destructive',
-        title: "Erreur",
-        description: "Impossible de vérifier le lien, utilisateur non authentifié.",
-      });
-      return;
-    }
-
+    if (!user || !firestore) return;
     setCheckingLinkId(resource.id);
     try {
       const result = await checkLink({ url: resource.url });
-      
       if (result.status === 'active') {
-        toast({
-          title: "Lien Actif",
-          description: `Le lien pour "${resource.title}" est accessible (Code: ${result.statusCode}).`,
-        });
+        toast({ title: "Lien Actif", description: `Le lien pour "${resource.title}" est accessible (Code: ${result.statusCode}).` });
       } else {
         const feedbackMessage = result.status === 'error' 
             ? `Le lien pour la ressource "${resource.title}" a retourné une erreur : ${result.errorMessage}`
             : `Le lien pour la ressource "${resource.title}" semble être cassé (Code de statut: ${result.statusCode}).`;
-
-        toast({
-            variant: 'destructive',
-            title: "Lien Cassé ou Inaccessible",
-            description: `Un rapport a été créé dans la section feedback.`,
-        });
-        
-        const dataToSend: any = {
-          type: 'Problème de ressource',
-          message: feedbackMessage,
-          userId: user.uid,
-          userEmail: user.email || 'N/A',
-          userName: 'Système de Vérification',
-          status: 'Nouveau',
-          createdAt: serverTimestamp(),
-          resourceId: resource.id,
-          resourceTitle: resource.title,
-        };
-
-        addDoc(collection(firestore, "feedback"), dataToSend)
-          .catch(async () => {
+        toast({ variant: 'destructive', title: "Lien Cassé ou Inaccessible", description: "Un rapport a été créé dans la section feedback." });
+        const dataToSend: any = { type: 'Problème de ressource', message: feedbackMessage, userId: user.uid, userEmail: user.email || 'N/A', userName: 'Système de Vérification', status: 'Nouveau', createdAt: serverTimestamp(), resourceId: resource.id, resourceTitle: resource.title };
+        addDoc(collection(firestore, "feedback"), dataToSend).catch(async () => {
             const permissionError = new FirestorePermissionError({ path: 'feedback', operation: 'create', requestResourceData: dataToSend });
             errorEmitter.emit('permission-error', permissionError);
-          });
-      }
-    } catch(e) {
-       toast({
-            variant: 'destructive',
-            title: "Erreur inattendue",
-            description: `Une erreur s'est produite lors de la vérification du lien.`,
         });
-    } finally {
-        setCheckingLinkId(null);
-    }
+      }
+    } catch(e) { toast({ variant: 'destructive', title: "Erreur inattendue", description: "Une erreur s'est produite lors de la vérification du lien." }); }
+    finally { setCheckingLinkId(null); }
   }
 
   function onResourceSubmit(values: z.infer<typeof resourceSchema>) {
     if (!firestore) return;
     const resourceData = { ...values, createdAt: serverTimestamp() };
-    
-    addDoc(collection(firestore, "resources"), resourceData)
-      .then(() => {
+    addDoc(collection(firestore, "resources"), resourceData).then(() => {
         toast({ title: "Ressource créée !", description: `"${values.title}" a été ajoutée.` });
         resourceForm.reset();
-      })
-      .catch(async () => {
-          const permissionError = new FirestorePermissionError({ path: 'resources', operation: 'create', requestResourceData: resourceData });
-          errorEmitter.emit('permission-error', permissionError);
-          toast({ title: "Erreur", description: "Impossible de créer la ressource. Vérifiez vos permissions.", variant: "destructive" });
-      });
+    }).catch(async () => {
+        const permissionError = new FirestorePermissionError({ path: 'resources', operation: 'create', requestResourceData: resourceData });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({ title: "Erreur", description: "Impossible de créer la ressource.", variant: "destructive" });
+    });
   }
 
   function onPathSubmit(values: z.infer<typeof pathSchema>) {
     if (!firestore) return;
     const steps: LearningPathStep[] = values.resourceIds.map((resourceId, index) => ({ order: index + 1, resourceId: resourceId }));
     const newPath = { title: values.title, description: values.description, categoryId: values.categoryId, difficulty: values.difficulty, steps: steps, createdAt: serverTimestamp() };
-    
-    addDoc(collection(firestore, "learningPaths"), newPath)
-      .then(() => {
+    addDoc(collection(firestore, "learningPaths"), newPath).then(() => {
         toast({ title: "Parcours créé !", description: `"${values.title}" a été ajouté.` });
         pathForm.reset();
-      })
-      .catch(async () => {
+    }).catch(async () => {
         const permissionError = new FirestorePermissionError({ path: 'learningPaths', operation: 'create', requestResourceData: newPath });
         errorEmitter.emit('permission-error', permissionError);
-        toast({ title: "Erreur", description: "Impossible de créer le parcours. Vérifiez vos permissions.", variant: "destructive" });
-      });
+        toast({ title: "Erreur", description: "Impossible de créer le parcours.", variant: "destructive" });
+    });
+  }
+
+  function onCertificationSubmit(values: z.infer<typeof certificationSchema>) {
+    if (!firestore) return;
+    const certData = { ...values, createdAt: serverTimestamp() };
+    addDoc(collection(firestore, "certifications"), certData).then(() => {
+        toast({ title: "Certification créée !", description: `"${values.title}" a été ajoutée.` });
+        certificationForm.reset();
+    }).catch(async () => {
+        const permissionError = new FirestorePermissionError({ path: 'certifications', operation: 'create', requestResourceData: certData });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({ title: "Erreur", description: "Impossible de créer la certification.", variant: "destructive" });
+    });
   }
 
   function onEditResourceSubmit(values: z.infer<typeof resourceSchema>) {
     if (!firestore || !editingResource) return;
     const resourceRef = doc(firestore, "resources", editingResource.id);
-    const updateData = { ...values };
-
-    updateDoc(resourceRef, updateData)
-      .then(() => {
+    updateDoc(resourceRef, values).then(() => {
         toast({ title: "Ressource mise à jour !" });
         setEditingResource(null);
-      })
-      .catch(async () => {
-        const permissionError = new FirestorePermissionError({ path: resourceRef.path, operation: 'update', requestResourceData: updateData });
+    }).catch(async () => {
+        const permissionError = new FirestorePermissionError({ path: resourceRef.path, operation: 'update', requestResourceData: values });
         errorEmitter.emit('permission-error', permissionError);
         toast({ title: "Erreur", description: "Impossible de mettre à jour la ressource.", variant: "destructive" });
-      });
+    });
   }
 
   function onEditPathSubmit(values: z.infer<typeof pathSchema>) {
     if (!firestore || !editingPath) return;
-
     const steps: LearningPathStep[] = values.resourceIds.map((resourceId, index) => ({ order: index + 1, resourceId: resourceId }));
     const pathData = { title: values.title, description: values.description, categoryId: values.categoryId, difficulty: values.difficulty, steps: steps };
-    
     const pathRef = doc(firestore, "learningPaths", editingPath.id);
-    updateDoc(pathRef, pathData)
-      .then(() => {
+    updateDoc(pathRef, pathData).then(() => {
         toast({ title: "Parcours mis à jour !" });
         setEditingPath(null);
-      })
-      .catch(async () => {
+    }).catch(async () => {
         const permissionError = new FirestorePermissionError({ path: pathRef.path, operation: 'update', requestResourceData: pathData });
         errorEmitter.emit('permission-error', permissionError);
         toast({ title: "Erreur", description: "Impossible de mettre à jour le parcours.", variant: "destructive" });
-      });
+    });
+  }
+
+  function onEditCertificationSubmit(values: z.infer<typeof certificationSchema>) {
+    if (!firestore || !editingCertification) return;
+    const certRef = doc(firestore, "certifications", editingCertification.id);
+    updateDoc(certRef, values).then(() => {
+        toast({ title: "Certification mise à jour !" });
+        setEditingCertification(null);
+    }).catch(async () => {
+        const permissionError = new FirestorePermissionError({ path: certRef.path, operation: 'update', requestResourceData: values });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({ title: "Erreur", description: "Impossible de mettre à jour la certification.", variant: "destructive" });
+    });
   }
 
   function handleDeleteResource() {
     if (!firestore || !deletingResourceId) return;
     const resourceRef = doc(firestore, 'resources', deletingResourceId);
-    deleteDoc(resourceRef)
-      .then(() => {
-        toast({ title: "Ressource supprimée" });
-      })
-      .catch(async () => {
+    deleteDoc(resourceRef).then(() => toast({ title: "Ressource supprimée" })).catch(async () => {
         const permissionError = new FirestorePermissionError({ path: resourceRef.path, operation: 'delete' });
         errorEmitter.emit('permission-error', permissionError);
         toast({ title: "Erreur", description: "Impossible de supprimer la ressource.", variant: "destructive" });
-      })
-      .finally(() => {
-        setDeletingResourceId(null);
-      });
+    }).finally(() => setDeletingResourceId(null));
   }
 
   function handleDeletePath() {
     if (!firestore || !deletingPathId) return;
     const pathRef = doc(firestore, 'learningPaths', deletingPathId);
-    deleteDoc(pathRef)
-      .then(() => {
-        toast({ title: "Parcours supprimé" });
-      })
-      .catch(async () => {
+    deleteDoc(pathRef).then(() => toast({ title: "Parcours supprimé" })).catch(async () => {
         const permissionError = new FirestorePermissionError({ path: pathRef.path, operation: 'delete' });
         errorEmitter.emit('permission-error', permissionError);
         toast({ title: "Erreur", description: "Impossible de supprimer le parcours.", variant: "destructive" });
-      })
-      .finally(() => {
-        setDeletingPathId(null);
-      });
+    }).finally(() => setDeletingPathId(null));
+  }
+
+  function handleDeleteCertification() {
+    if (!firestore || !deletingCertificationId) return;
+    const certRef = doc(firestore, 'certifications', deletingCertificationId);
+    deleteDoc(certRef).then(() => toast({ title: "Certification supprimée" })).catch(async () => {
+        const permissionError = new FirestorePermissionError({ path: certRef.path, operation: 'delete' });
+        errorEmitter.emit('permission-error', permissionError);
+        toast({ title: "Erreur", description: "Impossible de supprimer la certification.", variant: "destructive" });
+    }).finally(() => setDeletingCertificationId(null));
   }
 
   function handleFeedbackStatusChange(feedbackId: string, status: FeedbackStatus) {
     if (!firestore) return;
     const feedbackRef = doc(firestore, 'feedback', feedbackId);
-    updateDoc(feedbackRef, { status })
-      .then(() => {
+    updateDoc(feedbackRef, { status }).then(() => {
         toast({ title: "Statut du feedback mis à jour." });
-      })
-      .catch(async () => {
+    }).catch(async () => {
         const permissionError = new FirestorePermissionError({ path: feedbackRef.path, operation: 'update', requestResourceData: { status } });
         errorEmitter.emit('permission-error', permissionError);
         toast({ title: "Erreur", description: "Impossible de mettre à jour le statut.", variant: "destructive" });
-      });
+    });
   }
 
-  const loading = resourcesLoading || pathsLoading || feedbacksLoading || progressLoading || usersLoading;
+  const loading = resourcesLoading || pathsLoading || certificationsLoading || feedbacksLoading || progressLoading || usersLoading;
 
   if (loading) {
     return (
@@ -376,17 +338,19 @@ export default function AdminPage() {
       <AppHeader title="Tableau de bord Admin" />
       <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto">
         <div className="space-y-8">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
             <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Utilisateurs</CardTitle><Users className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{users.length}</div></CardContent></Card>
             <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Ressources</CardTitle><BookOpen className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{resources.length}</div></CardContent></Card>
             <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Parcours Créés</CardTitle><Milestone className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{learningPaths.length}</div></CardContent></Card>
+            <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Certifications</CardTitle><Award className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{certifications.length}</div></CardContent></Card>
             <Card><CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"><CardTitle className="text-sm font-medium">Total Favoris</CardTitle><Heart className="h-4 w-4 text-muted-foreground" /></CardHeader><CardContent><div className="text-2xl font-bold">{totalLikes}</div></CardContent></Card>
           </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="resources">Gérer les Ressources</TabsTrigger>
               <TabsTrigger value="paths">Gérer les Parcours</TabsTrigger>
+              <TabsTrigger value="certifications">Gérer les Certifications</TabsTrigger>
               <TabsTrigger value="feedbacks">Gérer les Feedbacks</TabsTrigger>
             </TabsList>
             
@@ -441,6 +405,23 @@ export default function AdminPage() {
               </TableBody></Table></CardContent></Card>
             </TabsContent>
 
+             <TabsContent value="certifications" className="space-y-4">
+              <Card><CardHeader><CardTitle>Ajouter une nouvelle certification</CardTitle></CardHeader><CardContent><Form {...certificationForm}><form onSubmit={certificationForm.handleSubmit(onCertificationSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={certificationForm.control} name="title" render={({ field }) => (<FormItem><FormLabel>Titre</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /><FormField control={certificationForm.control} name="issuingBody" render={({ field }) => (<FormItem><FormLabel>Organisme</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={certificationForm.control} name="url" render={({ field }) => (<FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /><FormField control={certificationForm.control} name="logoUrl" render={({ field }) => (<FormItem><FormLabel>URL du Logo</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
+                <FormField control={certificationForm.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={certificationForm.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Catégorie</FormLabel><Select onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent>{categories.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} /><FormField control={certificationForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulté</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Débutant">Débutant</SelectItem><SelectItem value="Intermédiaire">Intermédiaire</SelectItem><SelectItem value="Avancé">Avancé</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} /></div>
+                <Button type="submit" disabled={certificationForm.formState.isSubmitting}>Ajouter la certification</Button>
+              </form></Form></CardContent></Card>
+              
+              <Card><CardHeader><CardTitle>Gérer les certifications existantes</CardTitle></CardHeader><CardContent><Table><TableHeader><TableRow><TableHead>Titre</TableHead><TableHead>Organisme</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader><TableBody>
+                {certifications.map((cert) => (<TableRow key={cert.id}><TableCell className="font-medium">{cert.title}</TableCell><TableCell>{cert.issuingBody}</TableCell><TableCell className="text-right">
+                  <Button variant="ghost" size="icon" onClick={() => setEditingCertification(cert)}><Pencil className="h-4 w-4" /><span className="sr-only">Modifier</span></Button>
+                  <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600" onClick={() => setDeletingCertificationId(cert.id)}><Trash2 className="h-4 w-4" /><span className="sr-only">Supprimer</span></Button>
+                </TableCell></TableRow>))}
+              </TableBody></Table></CardContent></Card>
+            </TabsContent>
+
             <TabsContent value="feedbacks">
               <Card>
                 <CardHeader><CardTitle>Feedbacks des utilisateurs</CardTitle><CardDescription>Gérez les retours et les problèmes signalés.</CardDescription></CardHeader>
@@ -453,36 +434,16 @@ export default function AdminPage() {
                         return (
                           <TableRow key={feedback.id}>
                             <TableCell className="max-w-xs truncate">
-                              <Button
-                                variant="link"
-                                className="p-0 h-auto text-left font-normal text-current hover:no-underline hover:text-primary"
-                                onClick={() => setViewingFeedback(feedback)}
-                              >
-                                {feedback.message}
-                              </Button>
+                              <Button variant="link" className="p-0 h-auto text-left font-normal text-current hover:no-underline hover:text-primary" onClick={() => setViewingFeedback(feedback)}>{feedback.message}</Button>
                             </TableCell>
                             <TableCell>{feedback.type}</TableCell>
-                            <TableCell>
-                              {resource ? (
-                                <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" title={resource.title}>
-                                  {feedback.resourceTitle || resource.title}
-                                </a>
-                              ) : (
-                                <span className="text-muted-foreground">-</span>
-                              )}
-                            </TableCell>
+                            <TableCell>{resource ? (<a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" title={resource.title}>{feedback.resourceTitle || resource.title}</a>) : (<span className="text-muted-foreground">-</span>)}</TableCell>
                             <TableCell>{feedback.userName || feedback.userEmail}</TableCell>
                             <TableCell>{feedback.createdAt ? format(feedback.createdAt.toDate(), 'P p', { locale: fr }) : ''}</TableCell>
                             <TableCell>
                               <Select defaultValue={feedback.status} onValueChange={(value) => handleFeedbackStatusChange(feedback.id, value as FeedbackStatus)}>
-                                  <SelectTrigger className={cn("w-[120px]", feedbackStatusStyles[feedback.status])}>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                      <SelectItem value="Nouveau">Nouveau</SelectItem>
-                                      <SelectItem value="En cours">En cours</SelectItem>
-                                      <SelectItem value="Résolu">Résolu</SelectItem>
-                                  </SelectContent>
+                                  <SelectTrigger className={cn("w-[120px]", feedbackStatusStyles[feedback.status])}><SelectValue /></SelectTrigger>
+                                  <SelectContent><SelectItem value="Nouveau">Nouveau</SelectItem><SelectItem value="En cours">En cours</SelectItem><SelectItem value="Résolu">Résolu</SelectItem></SelectContent>
                               </Select>
                             </TableCell>
                           </TableRow>
@@ -534,6 +495,24 @@ export default function AdminPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+       <Dialog open={!!editingCertification} onOpenChange={(open) => !open && setEditingCertification(null)}>
+        <DialogContent className="sm:max-w-xl"><DialogHeader><DialogTitle>Modifier la certification</DialogTitle></DialogHeader>
+          <Form {...editCertificationForm}><form onSubmit={editCertificationForm.handleSubmit(onEditCertificationSubmit)} className="space-y-6 py-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={editCertificationForm.control} name="title" render={({ field }) => (<FormItem><FormLabel>Titre</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /><FormField control={editCertificationForm.control} name="issuingBody" render={({ field }) => (<FormItem><FormLabel>Organisme</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={editCertificationForm.control} name="url" render={({ field }) => (<FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /><FormField control={editCertificationForm.control} name="logoUrl" render={({ field }) => (<FormItem><FormLabel>URL du Logo</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
+            <FormField control={editCertificationForm.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={editCertificationForm.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Catégorie</FormLabel><Select onValueChange={field.onChange} defaultValue={String(field.value)}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent>{categories.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} /><FormField control={editCertificationForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulté</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Débutant">Débutant</SelectItem><SelectItem value="Intermédiaire">Intermédiaire</SelectItem><SelectItem value="Avancé">Avancé</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} /></div>
+            <DialogFooter><Button type="submit" disabled={editCertificationForm.formState.isSubmitting}>Enregistrer</Button></DialogFooter>
+          </form></Form>
+        </DialogContent>
+      </Dialog>
+      <AlertDialog open={!!deletingCertificationId} onOpenChange={(open) => !open && setDeletingCertificationId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader><AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle><AlertDialogDescription>Cette action est irréversible et supprimera définitivement la certification.</AlertDialogDescription></AlertDialogHeader>
+          <AlertDialogFooter><AlertDialogCancel>Annuler</AlertDialogCancel><AlertDialogAction onClick={handleDeleteCertification}>Supprimer</AlertDialogAction></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Dialog open={!!viewingFeedback} onOpenChange={(open) => !open && setViewingFeedback(null)}>
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
@@ -561,13 +540,3 @@ export default function AdminPage() {
     </>
   );
 }
-    
-
-    
-
-
-
-
-
-    
-
