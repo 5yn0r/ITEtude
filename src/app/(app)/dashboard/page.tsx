@@ -135,7 +135,7 @@ export default function DashboardPage() {
   return (
     <>
       <AppHeader title="Mon tableau de bord" />
-      <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto">
+      <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto overscroll-y-contain">
         <div className="sticky top-0 z-10 border-b bg-background pt-4 md:pt-6 lg:pt-8">
             <div className="px-4 md:px-6 lg:px-8">
                 <div className="mb-2">
@@ -310,3 +310,5 @@ export default function DashboardPage() {
     </>
   );
 }
+
+    
