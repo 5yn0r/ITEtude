@@ -61,7 +61,7 @@ export function CertificationCard({ certification }: CertificationCardProps) {
         </div>
          <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t mt-4">
             {certification.issuedAt && (
-                <p>Délivré le : <span className="font-medium text-foreground">{format(certification.issuedAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span></p>
+                <p>Commencé le : <span className="font-medium text-foreground">{format(certification.issuedAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span></p>
             )}
             {isExpired ? (
                  <p className="font-semibold text-destructive">Expiré le : {format(certification.expiresAt.toDate(), 'd MMMM yyyy', { locale: fr })}</p>
