@@ -157,11 +157,11 @@ export default function LandingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
                     <div>
                         <p className="text-5xl font-bold text-primary">160+</p>
-                        <p className="text-muted-foreground mt-2 font-semibold">Total Utilisateurs</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Utilisateurs</p>
                     </div>
                     <div>
                         <p className="text-5xl font-bold text-primary">15+</p>
-                        <p className="text-muted-foreground mt-2 font-semibold">Total Ressources</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Ressources</p>
                     </div>
                     <div>
                         <p className="text-5xl font-bold text-primary">2+</p>
