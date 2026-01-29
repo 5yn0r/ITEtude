@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Certification, Difficulty } from "@/lib/types";
+import type { Certification, Difficulty, CertificationStatus } from "@/lib/types";
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { categories } from '@/lib/data';
@@ -21,6 +21,12 @@ const difficultyStyles: Record<Difficulty, string> = {
   Intermédiaire: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-800",
   Avancé: "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/50 dark:text-purple-300 dark:border-purple-800",
 };
+
+const statusStyles: Record<CertificationStatus, string> = {
+  Gratuit: "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/50 dark:text-green-300 dark:border-green-800",
+  Payant: "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/50 dark:text-yellow-300 dark:border-yellow-800",
+};
+
 
 export function CertificationCard({ certification }: CertificationCardProps) {
   const category = categories.find(c => c.id === certification.categoryId);
@@ -50,6 +56,8 @@ export function CertificationCard({ certification }: CertificationCardProps) {
         <div className="flex flex-wrap gap-2">
             <Badge variant="outline" className={cn(difficultyStyles[certification.difficulty])}>{certification.difficulty}</Badge>
             {category && <Badge variant="secondary">{category.name}</Badge>}
+            <Badge variant="secondary">{certification.language}</Badge>
+            <Badge variant="outline" className={cn(statusStyles[certification.status])}>{certification.status}</Badge>
         </div>
          <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t mt-4">
             {certification.issuedAt && (
