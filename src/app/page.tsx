@@ -165,7 +165,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                         <p className="text-5xl font-bold text-primary">2+</p>
-                        <p className="text-muted-foreground mt-2 font-semibold">Parcours Créés</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Parcours</p>
                     </div>
                 </div>
             </div>
