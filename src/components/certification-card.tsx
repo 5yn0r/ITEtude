@@ -50,7 +50,7 @@ export function CertificationCard({ certification }: CertificationCardProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
-        <p className="text-sm text-muted-foreground line-clamp-3">
+        <p className="text-sm text-muted-foreground">
           {certification.description || "Aucune description disponible."}
         </p>
         <div className="flex flex-wrap gap-2">
