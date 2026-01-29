@@ -45,6 +45,12 @@ const nextConfig: NextConfig = {
         hostname: 't3.ftcdn.net',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.hashnode.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
