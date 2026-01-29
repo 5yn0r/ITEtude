@@ -152,6 +152,24 @@ export default function LandingPage() {
                 description="Déployez et gérez des applications sur des infrastructures cloud."
               />
             </div>
+
+            <div className="mt-20">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                    <div>
+                        <p className="text-5xl font-bold text-primary">160+</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Total Utilisateurs</p>
+                    </div>
+                    <div>
+                        <p className="text-5xl font-bold text-primary">15+</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Total Ressources</p>
+                    </div>
+                    <div>
+                        <p className="text-5xl font-bold text-primary">2+</p>
+                        <p className="text-muted-foreground mt-2 font-semibold">Parcours Créés</p>
+                    </div>
+                </div>
+            </div>
+
             <div className="mt-16 text-center">
               <p className="text-lg italic text-muted-foreground">
                 L'information est gratuite, mais le temps est cher.
