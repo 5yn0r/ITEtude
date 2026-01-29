@@ -3,6 +3,7 @@ import type { LucideIcon } from "lucide-react";
 export type DataWeight = 'Plume' | 'Standard' | 'Media' | 'Flux';
 export type Difficulty = 'Débutant' | 'Intermédiaire' | 'Avancé';
 export type ProgressStatus = 'non commencé' | 'en cours' | 'terminé';
+export type CertificationStatus = 'Gratuit' | 'Payant';
 
 export type Category = {
   id: number;
@@ -50,6 +51,8 @@ export type Certification = {
   difficulty: Difficulty;
   issuedAt?: any; // Firestore Timestamp
   expiresAt?: any | null; // Firestore Timestamp or null
+  language: string;
+  status: CertificationStatus;
 };
 
 export type UserProfile = {

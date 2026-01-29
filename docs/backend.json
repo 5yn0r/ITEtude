@@ -186,6 +186,16 @@
           ],
           "format": "date-time",
           "description": "The date the certification expires, or null if it does not expire."
+        },
+        "language": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Gratuit",
+            "Payant"
+          ]
         }
       },
       "required": [
@@ -194,7 +204,9 @@
         "url",
         "logoUrl",
         "categoryId",
-        "difficulty"
+        "difficulty",
+        "language",
+        "status"
       ]
     },
     "UserProgress": {

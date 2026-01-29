@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/app-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { categories } from "@/lib/data";
-import type { Resource, LearningPath, LearningPathStep, Feedback, FeedbackStatus, UserProgress, UserProfile, Certification } from "@/lib/types";
+import type { Resource, LearningPath, LearningPathStep, Feedback, FeedbackStatus, UserProgress, UserProfile, Certification, CertificationStatus } from "@/lib/types";
 import { Milestone, BookOpen, PlusCircle, Pencil, Trash2, Heart, ArrowUpRight, Users, Loader2, ScanLine, Award, CalendarDays } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -72,6 +72,8 @@ const certificationSchema = z.object({
   difficulty: z.enum(['Débutant', 'Intermédiaire', 'Avancé']),
   issuedAt: z.date({ required_error: "La date d'émission est requise." }),
   expiresAt: z.date().nullable().optional(),
+  language: z.string({ required_error: "La langue est requise." }),
+  status: z.enum(['Gratuit', 'Payant'], { required_error: "Le statut est requis." }),
 });
 
 
@@ -115,7 +117,7 @@ export default function AdminPage() {
 
   const certificationForm = useForm<z.infer<typeof certificationSchema>>({
     resolver: zodResolver(certificationSchema),
-    defaultValues: { title: "", issuingBody: "", url: "", logoUrl: "", description: "", difficulty: "Débutant", issuedAt: undefined, expiresAt: null },
+    defaultValues: { title: "", issuingBody: "", url: "", logoUrl: "", description: "", difficulty: "Débutant", issuedAt: undefined, expiresAt: null, language: 'Anglais', status: 'Payant' },
   });
 
   const editResourceForm = useForm<z.infer<typeof resourceSchema>>({ resolver: zodResolver(resourceSchema) });
@@ -416,6 +418,10 @@ export default function AdminPage() {
                 <FormField control={certificationForm.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={certificationForm.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Catégorie</FormLabel><Select onValueChange={field.onChange}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent>{categories.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} /><FormField control={certificationForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulté</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Débutant">Débutant</SelectItem><SelectItem value="Intermédiaire">Intermédiaire</SelectItem><SelectItem value="Avancé">Avancé</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} /></div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField control={certificationForm.control} name="language" render={({ field }) => (<FormItem><FormLabel>Langue</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Français">Français</SelectItem><SelectItem value="Anglais">Anglais</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                  <FormField control={certificationForm.control} name="status" render={({ field }) => (<FormItem><FormLabel>Statut</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Gratuit">Gratuit</SelectItem><SelectItem value="Payant">Payant</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField control={certificationForm.control} name="issuedAt" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Date d'émission</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><CalendarDays className="mr-2 h-4 w-4" />{field.value ? format(field.value, 'P', { locale: fr }) : <span>Choisir une date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
                   <FormField control={certificationForm.control} name="expiresAt" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Date d'expiration (optionnel)</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><CalendarDays className="mr-2 h-4 w-4" />{field.value ? format(field.value, 'P', { locale: fr }) : <span>Choisir une date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value ?? undefined} onSelect={(d) => field.onChange(d || null)} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
                 </div>
@@ -423,7 +429,7 @@ export default function AdminPage() {
               </form></Form></CardContent></Card>
               
               <Card><CardHeader><CardTitle>Gérer les certifications existantes</CardTitle></CardHeader><CardContent><Table><TableHeader><TableRow>
-                <TableHead>Titre</TableHead><TableHead>Organisme</TableHead><TableHead>Émission</TableHead><TableHead>Expiration</TableHead><TableHead className="text-right">Actions</TableHead>
+                <TableHead>Titre</TableHead><TableHead>Organisme</TableHead><TableHead>Langue</TableHead><TableHead>Statut</TableHead><TableHead>Expiration</TableHead><TableHead className="text-right">Actions</TableHead>
                 </TableRow></TableHeader><TableBody>
                 {certifications.map((cert) => {
                   const isExpired = cert.expiresAt && cert.expiresAt.toDate() < new Date();
@@ -431,7 +437,8 @@ export default function AdminPage() {
                   <TableRow key={cert.id} className={cn(isExpired && 'bg-red-500/10')}>
                     <TableCell className="font-medium">{cert.title}</TableCell>
                     <TableCell>{cert.issuingBody}</TableCell>
-                    <TableCell>{cert.issuedAt ? format(cert.issuedAt.toDate(), 'P', { locale: fr }) : '-'}</TableCell>
+                    <TableCell>{cert.language}</TableCell>
+                    <TableCell>{cert.status}</TableCell>
                     <TableCell>
                       {cert.expiresAt ? <span className={cn(isExpired && 'text-red-600 font-semibold')}>{format(cert.expiresAt.toDate(), 'P', { locale: fr })}</span> : 'Jamais'}
                     </TableCell>
@@ -524,6 +531,10 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={editCertificationForm.control} name="url" render={({ field }) => (<FormItem><FormLabel>URL</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /><FormField control={editCertificationForm.control} name="logoUrl" render={({ field }) => (<FormItem><FormLabel>URL du Logo</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} /></div>
             <FormField control={editCertificationForm.control} name="description" render={({ field }) => (<FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>)} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4"><FormField control={editCertificationForm.control} name="categoryId" render={({ field }) => (<FormItem><FormLabel>Catégorie</FormLabel><Select onValueChange={field.onChange} defaultValue={String(field.value)}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent>{categories.map(c => <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} /><FormField control={editCertificationForm.control} name="difficulty" render={({ field }) => (<FormItem><FormLabel>Difficulté</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Débutant">Débutant</SelectItem><SelectItem value="Intermédiaire">Intermédiaire</SelectItem><SelectItem value="Avancé">Avancé</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} /></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField control={editCertificationForm.control} name="language" render={({ field }) => (<FormItem><FormLabel>Langue</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Français">Français</SelectItem><SelectItem value="Anglais">Anglais</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+              <FormField control={editCertificationForm.control} name="status" render={({ field }) => (<FormItem><FormLabel>Statut</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Choisir..." /></SelectTrigger></FormControl><SelectContent><SelectItem value="Gratuit">Gratuit</SelectItem><SelectItem value="Payant">Payant</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+            </div>
              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField control={editCertificationForm.control} name="issuedAt" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Date d'émission</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><CalendarDays className="mr-2 h-4 w-4" />{field.value ? format(field.value, 'P', { locale: fr }) : <span>Choisir une date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
                   <FormField control={editCertificationForm.control} name="expiresAt" render={({ field }) => (<FormItem className="flex flex-col"><FormLabel>Date d'expiration (optionnel)</FormLabel><Popover><PopoverTrigger asChild><FormControl><Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}><CalendarDays className="mr-2 h-4 w-4" />{field.value ? format(field.value, 'P', { locale: fr }) : <span>Choisir une date</span>}</Button></FormControl></PopoverTrigger><PopoverContent className="w-auto p-0" align="start"><Calendar mode="single" selected={field.value ?? undefined} onSelect={(d) => field.onChange(d || null)} initialFocus /></PopoverContent></Popover><FormMessage /></FormItem>)} />
