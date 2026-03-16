@@ -168,26 +168,26 @@ export default function DashboardPage() {
       <AppHeader title="Mon tableau de bord" />
       <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto overscroll-y-contain">
         {/* Sticky Header with high Z-Index and opaque background */}
-        <div className="sticky top-0 z-40 border-b bg-background pt-4 md:pt-6 lg:pt-8 shadow-sm">
+        <div className="sticky top-0 z-40 border-b bg-background pt-2 md:pt-6 shadow-sm">
             <div className="px-4 md:px-6 lg:px-8">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                <div className="flex items-center justify-between gap-2 mb-1 md:mb-2">
                     <div>
-                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
-                        <p className="text-sm md:text-base text-muted-foreground">Ravi de vous revoir. Voici un aperçu de vos progrès.</p>
+                        <h2 className="text-xl md:text-3xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
+                        <p className="hidden md:block text-sm md:text-base text-muted-foreground">Ravi de vous revoir. Voici un aperçu de vos progrès.</p>
                     </div>
-                    <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 self-start md:self-auto">
-                        <Zap className="w-5 h-5 fill-primary" />
-                        <span className="font-bold text-sm">Version 2.0</span>
+                    <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-1 md:px-4 md:py-2 rounded-full border border-primary/20 shrink-0">
+                        <Zap className="w-3.5 h-3.5 md:w-5 md:h-5 fill-primary" />
+                        <span className="font-bold text-[10px] md:text-sm">V2.0</span>
                     </div>
                 </div>
                 
-                <div className="relative max-w-2xl mx-auto my-6 flex flex-col sm:flex-row gap-2 pb-4">
+                <div className="relative max-w-2xl mx-auto my-3 md:my-6 flex flex-row gap-2 pb-2 md:pb-4">
                     <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Que voulez-vous apprendre ?"
-                            className="pl-12 w-full rounded-full bg-secondary/30 h-12 text-base md:text-lg shadow-inner focus:bg-background transition-all"
+                            placeholder="Rechercher..."
+                            className="pl-9 md:pl-12 w-full rounded-full bg-secondary/30 h-10 md:h-12 text-sm md:text-lg shadow-inner focus:bg-background transition-all"
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -199,10 +199,11 @@ export default function DashboardPage() {
                     <Button 
                         onClick={handleAISearch} 
                         disabled={!searchQuery.trim() || isAISearching}
-                        className="rounded-full h-12 gap-2 px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold shrink-0"
+                        className="rounded-full h-10 md:h-12 gap-1.5 px-4 md:px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold shrink-0 text-xs md:text-sm"
                     >
-                        {isAISearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
-                        Conseil IA
+                        {isAISearching ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Sparkles className="w-4 h-4 md:w-5 md:h-5" />}
+                        <span className="hidden sm:inline">Conseil IA</span>
+                        <span className="sm:hidden">IA</span>
                     </Button>
                 </div>
             </div>
@@ -270,37 +271,37 @@ export default function DashboardPage() {
           {!searchResults && !aiResults && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="border-l-4 border-l-success shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="flex items-center gap-4 p-6">
-                  <div className="p-3 bg-success/10 rounded-full">
-                    <Trophy className="w-6 h-6 text-success" />
+                <CardContent className="flex items-center gap-4 p-4 md:p-6">
+                  <div className="p-2 md:p-3 bg-success/10 rounded-full">
+                    <Trophy className="w-5 h-5 md:w-6 md:h-6 text-success" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Parcours terminés</p>
-                    <p className="text-2xl font-bold">{stats.completedPaths}</p>
+                    <p className="text-[10px] md:text-sm font-medium text-muted-foreground uppercase tracking-wider">Parcours terminés</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.completedPaths}</p>
                   </div>
                 </CardContent>
               </Card>
               
               <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="flex items-center gap-4 p-6">
-                  <div className="p-3 bg-red-500/10 rounded-full">
-                    <Heart className="w-6 h-6 text-red-500 fill-red-500" />
+                <CardContent className="flex items-center gap-4 p-4 md:p-6">
+                  <div className="p-2 md:p-3 bg-red-500/10 rounded-full">
+                    <Heart className="w-5 h-5 md:w-6 md:h-6 text-red-500 fill-red-500" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Favoris enregistrés</p>
-                    <p className="text-2xl font-bold">{stats.totalFavorites}</p>
+                    <p className="text-[10px] md:text-sm font-medium text-muted-foreground uppercase tracking-wider">Favoris</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.totalFavorites}</p>
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
-                <CardContent className="flex items-center gap-4 p-6">
-                  <div className="p-3 bg-primary/10 rounded-full">
-                    <BookOpen className="w-6 h-6 text-primary" />
+                <CardContent className="flex items-center gap-4 p-4 md:p-6">
+                  <div className="p-2 md:p-3 bg-primary/10 rounded-full">
+                    <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">Ressources explorées</p>
-                    <p className="text-2xl font-bold">{stats.exploredResources}</p>
+                    <p className="text-[10px] md:text-sm font-medium text-muted-foreground uppercase tracking-wider">Explorées</p>
+                    <p className="text-xl md:text-2xl font-bold">{stats.exploredResources}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -310,17 +311,17 @@ export default function DashboardPage() {
           {(searchResults && !aiResults) ? (
              <div className="space-y-8">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xl md:text-2xl font-semibold tracking-tight">
+                  <h3 className="text-lg md:text-2xl font-semibold tracking-tight">
                       Résultats pour "{searchQuery}"
                   </h3>
                   <Button variant="ghost" size="sm" onClick={() => setSearchQuery("")} className="text-muted-foreground">
-                    <X className="w-4 h-4 mr-2" /> Tout effacer
+                    <X className="w-4 h-4 mr-2" /> Effacer
                   </Button>
                 </div>
                 
                 {searchResults.paths.length > 0 && (
                     <section>
-                        <h4 className="text-lg md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
+                        <h4 className="text-base md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
                             <Milestone className="w-5 h-5 text-primary" />
                             Parcours correspondants
                         </h4>
@@ -342,7 +343,7 @@ export default function DashboardPage() {
 
                 {searchResults.resources.length > 0 && (
                      <section className="mt-8">
-                        <h4 className="text-lg md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
+                        <h4 className="text-base md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
                             <BookOpen className="w-5 h-5 text-primary" />
                             Ressources correspondantes
                         </h4>
@@ -355,10 +356,10 @@ export default function DashboardPage() {
                 )}
 
                 {searchResults.paths.length === 0 && searchResults.resources.length === 0 && (
-                    <div className="text-center py-16 bg-card rounded-2xl border-2 border-dashed">
-                        <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                        <p className="text-lg font-semibold text-muted-foreground">Aucun résultat classique trouvé</p>
-                        <p className="text-muted-foreground mb-6">Essayez d'utiliser le bouton <strong>Conseil IA</strong> pour une recherche plus large.</p>
+                    <div className="text-center py-12 bg-card rounded-2xl border-2 border-dashed">
+                        <Search className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
+                        <p className="text-base font-semibold text-muted-foreground">Aucun résultat classique trouvé</p>
+                        <p className="text-sm text-muted-foreground mb-6">Essayez d'utiliser l'IA pour une recherche plus large.</p>
                         <Button onClick={handleAISearch} disabled={isAISearching}>
                           {isAISearching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                           Demander à l'IA
@@ -370,11 +371,11 @@ export default function DashboardPage() {
             <>
                 <section>
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
-                            <Milestone className="w-6 h-6 text-primary" />
+                        <h3 className="text-lg md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+                            <Milestone className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                             Mes Parcours
                         </h3>
-                        <Button asChild variant="link" className="text-primary p-0">
+                        <Button asChild variant="link" className="text-primary p-0 h-auto text-sm">
                             <Link href="/parcours">Tout voir</Link>
                         </Button>
                     </div>
@@ -387,17 +388,17 @@ export default function DashboardPage() {
                             };
                             return (
                             <Card key={path.id} className="overflow-hidden group hover:shadow-md transition-all">
-                            <CardHeader className="relative">
+                            <CardHeader className="p-4 md:p-6 relative">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <CardTitle className="group-hover:text-primary transition-colors text-lg">{path.title}</CardTitle>
-                                        <CardDescription>Étape {path.currentStep} sur {path.totalSteps}</CardDescription>
+                                        <CardTitle className="group-hover:text-primary transition-colors text-base md:text-lg">{path.title}</CardTitle>
+                                        <CardDescription className="text-xs md:text-sm">Étape {path.currentStep} sur {path.totalSteps}</CardDescription>
                                     </div>
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive transition-colors" onClick={handleRemovePath}>
-                                                    <X className="h-4 w-4" />
+                                                <Button variant="ghost" size="icon" className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground hover:text-destructive transition-colors" onClick={handleRemovePath}>
+                                                    <X className="h-3.5 w-3.5 md:h-4 md:w-4" />
                                                     <span className="sr-only">Masquer le parcours</span>
                                                 </Button>
                                             </TooltipTrigger>
@@ -408,18 +409,18 @@ export default function DashboardPage() {
                                     </TooltipProvider>
                                 </div>
                             </CardHeader>
-                            <CardContent>
+                            <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
                                 <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-medium">
+                                    <div className="space-y-1.5 md:space-y-2">
+                                        <div className="flex justify-between text-[10px] md:text-xs font-medium">
                                             <span>Progression</span>
                                             <span>{Math.round(path.progress)}%</span>
                                         </div>
-                                        <Progress value={path.progress} className="h-2" />
+                                        <Progress value={path.progress} className="h-1.5 md:h-2" />
                                     </div>
-                                    <Button asChild variant="default" className="w-full">
+                                    <Button asChild variant="default" className="w-full h-9 md:h-10 text-sm">
                                         <Link href={`/parcours/${path.id}`}>
-                                            {path.progress === 100 ? "Revoir le parcours" : "Continuer l'apprentissage"}
+                                            {path.progress === 100 ? "Revoir le parcours" : "Continuer"}
                                         </Link>
                                     </Button>
                                 </div>
@@ -429,16 +430,16 @@ export default function DashboardPage() {
                         </div>
                     ) : (
                         <Card className="border-dashed">
-                        <CardContent className="p-10 text-center text-muted-foreground flex flex-col items-center gap-4">
-                            <div className="p-4 bg-secondary rounded-full">
-                                <Milestone className="w-10 h-10 opacity-50" />
+                        <CardContent className="p-8 md:p-10 text-center text-muted-foreground flex flex-col items-center gap-4">
+                            <div className="p-3 md:p-4 bg-secondary rounded-full">
+                                <Milestone className="w-8 h-8 md:w-10 md:h-10 opacity-50" />
                             </div>
                             <div className="space-y-1">
-                                <p className="text-lg font-semibold text-foreground">Aucun parcours en cours</p>
-                                <p>Commencez votre voyage en explorant nos parcours thématiques.</p>
+                                <p className="text-base md:text-lg font-semibold text-foreground">Aucun parcours en cours</p>
+                                <p className="text-xs md:text-sm">Commencez votre voyage en explorant nos parcours thématiques.</p>
                             </div>
-                            <Button asChild className="mt-2">
-                                <Link href="/parcours">Explorer les parcours</Link>
+                            <Button asChild className="mt-2 h-9 text-sm">
+                                <Link href="/parcours">Explorer</Link>
                             </Button>
                         </CardContent>
                         </Card>
@@ -447,8 +448,8 @@ export default function DashboardPage() {
 
                 <section>
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
-                            <Heart className="w-6 h-6 text-red-500" />
+                        <h3 className="text-lg md:text-2xl font-semibold tracking-tight flex items-center gap-2">
+                            <Heart className="w-5 h-5 md:w-6 md:h-6 text-red-500" />
                             Mes Favoris
                         </h3>
                     </div>
@@ -456,21 +457,21 @@ export default function DashboardPage() {
                     {userFavoriteResources.length > 0 ? (
                         userFavoriteResources.map(resource => (
                           <Card key={resource.id} className="hover:border-primary/50 transition-all group shadow-sm">
-                              <CardContent className="p-4 flex justify-between items-center">
-                                <div className="flex flex-col">
-                                  <p className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base">{resource.title}</p>
+                              <CardContent className="p-3 md:p-4 flex justify-between items-center">
+                                <div className="flex flex-col flex-1 min-w-0 mr-2">
+                                  <p className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base truncate">{resource.title}</p>
                                   <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
-                                      <span className="bg-secondary px-1.5 py-0.5 rounded">{new URL(resource.url).hostname}</span>
+                                      <span className="bg-secondary px-1 py-0.5 rounded truncate max-w-[80px] md:max-w-none">{new URL(resource.url).hostname}</span>
                                       <span>•</span>
                                       <span>{resource.difficulty}</span>
                                   </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <Button variant="ghost" size="icon" className="text-red-500 hover:bg-red-50" onClick={() => toggleFavorite(resource.id)}>
-                                      <Heart className="w-5 h-5 fill-red-500" />
-                                      <span className="sr-only">Retirer des favoris</span>
+                                <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
+                                  <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:bg-red-50" onClick={() => toggleFavorite(resource.id)}>
+                                      <Heart className="w-4 h-4 md:w-5 md:h-5 fill-red-500" />
+                                      <span className="sr-only">Retirer</span>
                                   </Button>
-                                  <Button asChild size="sm">
+                                  <Button asChild size="sm" className="h-8 px-3 text-xs">
                                     <a href={resource.url} target="_blank" rel="noopener noreferrer">Accéder</a>
                                   </Button>
                                 </div>
@@ -479,16 +480,16 @@ export default function DashboardPage() {
                         ))
                       ) : (
                         <Card className="border-dashed">
-                          <CardContent className="p-10 text-center text-muted-foreground flex flex-col items-center gap-4">
-                            <div className="p-4 bg-secondary rounded-full">
-                                <Star className="w-10 h-10 opacity-50" />
+                          <CardContent className="p-8 md:p-10 text-center text-muted-foreground flex flex-col items-center gap-4">
+                            <div className="p-3 md:p-4 bg-secondary rounded-full">
+                                <Star className="w-8 h-8 md:w-10 md:h-10 opacity-50" />
                             </div>
                             <div className="space-y-1">
-                                <p className="text-lg font-semibold text-foreground">Votre liste est vide</p>
-                                <p>Marquez les ressources qui vous plaisent pour les retrouver ici.</p>
+                                <p className="text-base md:text-lg font-semibold text-foreground">Votre liste est vide</p>
+                                <p className="text-xs md:text-sm">Marquez les ressources qui vous plaisent pour les retrouver ici.</p>
                             </div>
-                            <Button asChild variant="outline" className="mt-2">
-                                <Link href="/parcours">Découvrir des ressources</Link>
+                            <Button asChild variant="outline" className="mt-2 h-9 text-sm">
+                                <Link href="/parcours">Découvrir</Link>
                             </Button>
                           </CardContent>
                         </Card>
