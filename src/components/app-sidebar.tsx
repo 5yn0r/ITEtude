@@ -145,10 +145,10 @@ export function AppSidebar({ className }: { className?: string }) {
             
             {isAdmin && (
                <Link
-                href="/admin"
+                href="/postadeep"
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 transition-all mt-2 border-t pt-3 border-sidebar-border",
-                  isActive("/admin") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
+                  isActive("/postadeep") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
                 )}
               >
                 <Shield className="h-4 w-4" />

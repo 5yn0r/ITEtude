@@ -27,7 +27,7 @@ export function AppHeader({ title }: AppHeaderProps) {
   const auth = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const isAdminSection = pathname.startsWith('/admin');
+  const isAdminSection = pathname.startsWith('/postadeep');
 
   const handleLogout = async () => {
     if (auth) {

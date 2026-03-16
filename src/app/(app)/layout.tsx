@@ -44,7 +44,7 @@ export default function AppLayout({
   const router = useRouter();
   const pathname = usePathname();
 
-  const isAdminRoute = pathname.startsWith('/admin');
+  const isAdminRoute = pathname.startsWith('/postadeep');
 
   useEffect(() => {
     if (!isAdminRoute && !loading && !user) {
