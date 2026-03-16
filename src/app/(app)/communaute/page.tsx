@@ -3,16 +3,18 @@
 import { AppHeader } from "@/components/app-header";
 import { useUser, useFirestore } from "@/firebase";
 import { useCollection } from "@/firebase/firestore/use-collection";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, deleteDoc, doc } from "firebase/firestore";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Loader2, Users as UsersIcon, MessageCircle, X } from "lucide-react";
+import { Send, Loader2, Users as UsersIcon, MessageCircle, X, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { useAdmin } from "@/hooks/use-admin";
+import { useToast } from "@/hooks/use-toast";
 
 type Message = {
   id: string;
@@ -25,7 +27,9 @@ type Message = {
 
 export default function CommunityPage() {
   const { user } = useUser();
+  const { isAdmin } = useAdmin();
   const firestore = useFirestore();
+  const { toast } = useToast();
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showBanner, setShowBanner] = useState(true);
@@ -66,6 +70,25 @@ export default function CommunityPage() {
       console.error("Erreur lors de l'envoi du message:", error);
     } finally {
       setIsSending(false);
+    }
+  };
+
+  const handleDeleteMessage = async (messageId: string) => {
+    if (!firestore || !isAdmin) return;
+
+    try {
+      await deleteDoc(doc(firestore, 'community_messages', messageId));
+      toast({
+        title: "Message supprimé",
+        description: "Le message a été retiré de la communauté.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de la suppression du message:", error);
+      toast({
+        variant: "destructive",
+        title: "Erreur",
+        description: "Impossible de supprimer le message.",
+      });
     }
   };
 
@@ -127,7 +150,7 @@ export default function CommunityPage() {
                       <div 
                         key={msg.id} 
                         className={cn(
-                          "flex items-start gap-3",
+                          "flex items-start gap-3 group",
                           isOwnMessage ? "flex-row-reverse" : "flex-row"
                         )}
                       >
@@ -144,17 +167,34 @@ export default function CommunityPage() {
                           isOwnMessage ? "items-end" : "items-start"
                         )}>
                           {showHeader && (
-                            <span className="text-[10px] font-bold text-muted-foreground mb-1 px-1">
-                              {isOwnMessage ? "Vous" : msg.userName}
-                            </span>
+                            <div className="flex items-center gap-2 mb-1 px-1">
+                                <span className="text-[10px] font-bold text-muted-foreground">
+                                  {isOwnMessage ? "Vous" : msg.userName}
+                                </span>
+                            </div>
                           )}
-                          <div className={cn(
-                            "px-4 py-2 rounded-2xl text-sm shadow-sm",
-                            isOwnMessage 
-                              ? "bg-primary text-primary-foreground rounded-tr-none" 
-                              : "bg-muted rounded-tl-none"
-                          )}>
-                            {msg.text}
+                          <div className="relative group/bubble flex items-center gap-2">
+                            {isAdmin && (
+                                <Button 
+                                    variant="ghost" 
+                                    size="icon" 
+                                    className={cn(
+                                        "h-6 w-6 opacity-0 group-hover/bubble:opacity-100 transition-opacity text-muted-foreground hover:text-destructive shrink-0",
+                                        isOwnMessage ? "order-first" : "order-last"
+                                    )}
+                                    onClick={() => handleDeleteMessage(msg.id)}
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                </Button>
+                            )}
+                            <div className={cn(
+                                "px-4 py-2 rounded-2xl text-sm shadow-sm",
+                                isOwnMessage 
+                                ? "bg-primary text-primary-foreground rounded-tr-none" 
+                                : "bg-muted rounded-tl-none"
+                            )}>
+                                {msg.text}
+                            </div>
                           </div>
                           <span className="text-[9px] text-muted-foreground mt-1 px-1">
                             {msg.createdAt ? format(msg.createdAt.toDate(), 'HH:mm', { locale: fr }) : ''}
