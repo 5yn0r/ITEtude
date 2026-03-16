@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppHeader } from "@/components/app-header";
@@ -9,10 +10,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Send, Loader2, Users as UsersIcon } from "lucide-react";
+import { Send, Loader2, Users as UsersIcon, MessageCircle, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils";
 
 type Message = {
   id: string;
@@ -28,6 +29,7 @@ export default function CommunityPage() {
   const firestore = useFirestore();
   const [newMessage, setNewMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [showBanner, setShowBanner] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Utilisation d'une collection dédiée pour les messages communautaires
@@ -87,6 +89,31 @@ export default function CommunityPage() {
                 </div>
               </div>
             </div>
+
+            {/* Bandeau WhatsApp pour les nouveaux arrivants */}
+            {showBanner && (
+              <div className="p-3 bg-green-500/10 border-b flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-500/20 rounded-full shrink-0">
+                    <MessageCircle className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-green-800">Nouveau sur la plateforme ?</p>
+                    <p className="text-xs text-green-700/80">Rejoignez aussi notre groupe WhatsApp ITEtude pour des échanges instantanés !</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 text-white rounded-full">
+                    <a href="https://chat.whatsapp.com/BSNQKeLK9DB8ziRajJimTv?mode=gi_t" target="_blank" rel="noopener noreferrer">
+                      Rejoindre
+                    </a>
+                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-green-700/50 hover:text-green-700 hover:bg-green-500/10" onClick={() => setShowBanner(false)}>
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Zone de messages */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
