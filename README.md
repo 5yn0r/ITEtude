@@ -51,7 +51,7 @@ Suivez ces étapes pour lancer le projet en local.
 ### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/000000DI/ITEtude.git
+git clone https://github.com/5yn0r/ITEtude.git
 cd ITEtude
 ```
 
@@ -59,8 +59,6 @@ cd ITEtude
 
 ```bash
 npm install
-# ou
-# yarn install
 ```
 
 ### 3. Configurer les variables d'environnement
@@ -94,6 +92,6 @@ Ouvrez [http://localhost:9002](http://localhost:9002) dans votre navigateur pour
 
 ---
 
-Merci de votre intérêt pour ITEtude !
+Merci à vous, et n'oubliez-pas de nous faire des retours après votre expérience sur la plateforme ITEtude accessible à l'adresse: https://itetude.com ! 
 
 "L'information est gratuite, mais le temps est cher"
