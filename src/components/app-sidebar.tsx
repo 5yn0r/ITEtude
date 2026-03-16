@@ -1,8 +1,9 @@
+
 'use client'
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Compass, Home, BookOpen, Milestone, Shield, ChevronRight, MessageSquare, Cloud, Award } from "lucide-react"
+import { Compass, Home, BookOpen, Milestone, Shield, ChevronRight, MessageSquare, Cloud, Award, StickyNote } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { categories } from "@/lib/data"
 import {
@@ -95,6 +96,17 @@ export function AppSidebar({ className }: { className?: string }) {
             >
               <Award className="h-4 w-4" />
               Certifications
+            </Link>
+
+            <Link
+              href="/notes"
+              className={cn(
+                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                isActive("/notes") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
+              )}
+            >
+              <StickyNote className="h-4 w-4" />
+              Mes Notes
             </Link>
             
             <Link

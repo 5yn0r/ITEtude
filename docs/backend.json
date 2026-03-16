@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "Admin": {
@@ -231,6 +232,33 @@
         "isFavorite"
       ]
     },
+    "Note": {
+      "title": "Note",
+      "description": "Represents a user's personal note.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "title",
+        "content",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
     "Feedback": {
       "title": "Feedback",
       "description": "Represents user feedback or a reported issue.",
@@ -330,6 +358,12 @@
         "$ref": "#/entities/UserProgress"
       },
       "description": "Sub-collection for user-specific progress and favorites. The document ID is the resourceId."
+    },
+    "/users/{userId}/notes": {
+      "schema": {
+        "$ref": "#/entities/Note"
+      },
+      "description": "Sub-collection for personal user notes."
     },
     "/feedback": {
       "schema": {

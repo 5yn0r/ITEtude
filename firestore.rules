@@ -1,3 +1,4 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -33,6 +34,11 @@ service cloud.firestore {
 
     // This rule allows a user to read and write to their own progress documents.
     match /users/{userId}/progress/{resourceId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+
+    // This rule allows a user to manage their own notes.
+    match /users/{userId}/notes/{noteId} {
       allow read, write: if request.auth.uid == userId;
     }
 

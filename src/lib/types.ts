@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 
 export type DataWeight = 'Plume' | 'Standard' | 'Media' | 'Flux';
@@ -53,6 +54,14 @@ export type Certification = {
   expiresAt?: any | null; // Firestore Timestamp or null
   language: string;
   status: CertificationStatus;
+};
+
+export type Note = {
+  id: string;
+  title: string;
+  content: string;
+  createdAt: any; // Firestore Timestamp
+  updatedAt: any; // Firestore Timestamp
 };
 
 export type UserProfile = {
