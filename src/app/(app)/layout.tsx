@@ -3,15 +3,35 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { useUser } from "@/firebase";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FavoritesProvider } from "@/context/favorites-context";
+import { Sparkles, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 function AppFooter() {
   return (
     <footer className="border-t bg-card p-3 text-center text-xs text-muted-foreground">
       &copy; {new Date().getFullYear()} ITEtude. Tous droits réservés.
     </footer>
+  );
+}
+
+function VersionBanner() {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="bg-primary px-4 py-2 text-primary-foreground flex items-center justify-between text-xs md:text-sm font-medium animate-in fade-in slide-in-from-top duration-500">
+      <div className="flex items-center gap-2 mx-auto">
+        <Sparkles className="w-4 h-4 fill-primary-foreground/20" />
+        <span>Bienvenue sur <strong>ITEtude V2.0</strong> ! Découvrez notre nouvelle recherche IA et l'espace communautaire.</span>
+      </div>
+      <button onClick={() => setIsVisible(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
   );
 }
 
@@ -24,13 +44,9 @@ export default function AppLayout({
   const router = useRouter();
   const pathname = usePathname();
 
-  // For admin routes, the protection and layout are handled by AdminLayout.
-  // This avoids showing the main app shell to non-admins.
   const isAdminRoute = pathname.startsWith('/admin');
 
   useEffect(() => {
-    // The admin route has its own auth protection.
-    // For all other routes, redirect to login if not authenticated.
     if (!isAdminRoute && !loading && !user) {
       router.push('/login');
     }
@@ -74,13 +90,16 @@ export default function AppLayout({
 
   return (
     <FavoritesProvider>
-      <div className="grid h-dvh w-full overflow-hidden md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-        <AppSidebar className="hidden md:block border-r" />
-        <div className="flex flex-col overflow-hidden">
-          <div className="flex-1 flex flex-col min-h-0 bg-secondary/50">
-             {children}
+      <div className="flex flex-col h-dvh w-full overflow-hidden">
+        <VersionBanner />
+        <div className="flex-1 grid md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr] overflow-hidden">
+          <AppSidebar className="hidden md:block border-r" />
+          <div className="flex flex-col overflow-hidden">
+            <div className="flex-1 flex flex-col min-h-0 bg-secondary/50">
+               {children}
+            </div>
+            <AppFooter />
           </div>
-          <AppFooter />
         </div>
       </div>
     </FavoritesProvider>

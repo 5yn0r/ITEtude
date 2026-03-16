@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Compass, Home, BookOpen, Milestone, Shield, ChevronRight, MessageSquare, Cloud, Award, StickyNote, Users } from "lucide-react"
+import { Compass, Home, BookOpen, Milestone, Shield, ChevronRight, MessageSquare, Cloud, Award, StickyNote, Users, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { categories } from "@/lib/data"
 import {
@@ -11,6 +11,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { useAdmin } from "@/hooks/use-admin"
+import { Badge } from "@/components/ui/badge"
 
 export function AppSidebar({ className }: { className?: string }) {
   const pathname = usePathname()
@@ -34,12 +35,18 @@ export function AppSidebar({ className }: { className?: string }) {
             <Link
               href="/dashboard"
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                "flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all",
                 isActive("/dashboard") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
               )}
             >
-              <Home className="h-4 w-4" />
-              Mon tableau de bord
+              <div className="flex items-center gap-3">
+                <Home className="h-4 w-4" />
+                Mon tableau de bord
+              </div>
+              <Badge variant="secondary" className="bg-primary/20 text-[10px] px-1 py-0 h-4 border-none text-primary-foreground/70">
+                <Sparkles className="w-2.5 h-2.5 mr-1" />
+                IA
+              </Badge>
             </Link>
             
             <Collapsible defaultOpen={pathname.includes('/ressources')}>
@@ -100,23 +107,29 @@ export function AppSidebar({ className }: { className?: string }) {
             <Link
               href="/notes"
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                "flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all",
                 isActive("/notes") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
               )}
             >
-              <StickyNote className="h-4 w-4" />
-              Mes Notes
+              <div className="flex items-center gap-3">
+                <StickyNote className="h-4 w-4" />
+                Mes Notes
+              </div>
+              <Badge variant="secondary" className="bg-success/20 text-success text-[9px] px-1 py-0 h-4 border-none uppercase font-bold">Nouveau</Badge>
             </Link>
 
             <Link
               href="/communaute"
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
+                "flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all",
                 isActive("/communaute") ? "bg-sidebar-accent text-sidebar-accent-foreground" : "hover:bg-sidebar-accent/50"
               )}
             >
-              <Users className="h-4 w-4" />
-              Communauté
+              <div className="flex items-center gap-3">
+                <Users className="h-4 w-4" />
+                Communauté
+              </div>
+              <Badge variant="secondary" className="bg-success/20 text-success text-[9px] px-1 py-0 h-4 border-none uppercase font-bold">Nouveau</Badge>
             </Link>
             
             <Link
