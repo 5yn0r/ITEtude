@@ -180,13 +180,13 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 
-                <div className="relative max-w-2xl mx-auto my-6 flex gap-2">
+                <div className="relative max-w-2xl mx-auto my-6 flex gap-2 pb-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                             type="search"
                             placeholder="Que voulez-vous apprendre aujourd'hui ?"
-                            className="pl-12 w-full rounded-full bg-secondary/30"
+                            className="pl-12 w-full rounded-full bg-secondary/30 h-12 text-lg shadow-inner focus:bg-background transition-all"
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -198,10 +198,10 @@ export default function DashboardPage() {
                     <Button 
                         onClick={handleAISearch} 
                         disabled={!searchQuery.trim() || isAISearching}
-                        className="rounded-full gap-2 px-6 shadow-md hover:shadow-primary/20 transition-all"
+                        className="rounded-full h-12 gap-2 px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold"
                     >
-                        {isAISearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                        Recherche IA
+                        {isAISearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                        Conseil IA
                     </Button>
                 </div>
             </div>
@@ -212,15 +212,25 @@ export default function DashboardPage() {
           {/* AI Search Results Section */}
           {aiResults && (
             <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-               <Alert className="bg-primary/5 border-primary/20">
-                  <BrainCircuit className="h-5 w-5 text-primary" />
-                  <AlertTitle className="font-bold text-primary">Conseils de l'IA d'ITEtude</AlertTitle>
-                  <AlertDescription className="text-muted-foreground italic">
+               <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
+                    <BrainCircuit className="w-6 h-6" />
+                    Recommandations de l'IA
+                  </h3>
+                  <Button variant="ghost" size="sm" onClick={() => setAiResults(null)} className="text-muted-foreground hover:text-foreground">
+                    <X className="w-4 h-4 mr-2" /> Effacer
+                  </Button>
+               </div>
+
+               <Alert className="bg-primary/5 border-primary/20 shadow-sm border-l-4 border-l-primary">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  <AlertTitle className="font-bold text-primary">Analyse pédagogique</AlertTitle>
+                  <AlertDescription className="text-foreground/80 leading-relaxed italic mt-1">
                     "{aiResults.summary}"
                   </AlertDescription>
                </Alert>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                   {aiResults.recommendations.map((rec) => {
                      const item = rec.type === 'resource' 
                         ? resources.find(r => r.id === rec.id)
@@ -229,38 +239,35 @@ export default function DashboardPage() {
                      if (!item) return null;
 
                      return (
-                        <div key={rec.id} className="space-y-2">
-                           <div className="bg-card p-3 rounded-lg border-2 border-primary/30 text-xs font-semibold text-primary flex items-center gap-2 shadow-sm">
-                              <Sparkles className="w-3.5 h-3.5" />
-                              IA : {rec.reason}
+                        <div key={rec.id} className="group relative flex flex-col pt-6">
+                           <div className="absolute top-0 left-4 z-10 px-3 py-1 bg-primary text-[11px] font-bold text-primary-foreground rounded-t-lg shadow-sm transform -translate-y-1 group-hover:-translate-y-2 transition-transform flex items-center gap-1.5">
+                              <Sparkles className="w-3 h-3" />
+                              POURQUOI : {rec.reason}
                            </div>
-                           {rec.type === 'resource' ? (
-                              <ResourceCard resource={item as Resource} />
-                           ) : (
-                              <LearningPathCard 
-                                 path={item as LearningPath}
-                                 categoryName={categories.find(c => c.id === (item as LearningPath).categoryId)?.name || 'Inconnue'}
-                                 resourceCount={(item as LearningPath).steps.length}
-                              />
-                           )}
+                           <div className="flex-1 rounded-xl ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-md overflow-hidden bg-background">
+                              {rec.type === 'resource' ? (
+                                 <ResourceCard resource={item as Resource} />
+                              ) : (
+                                 <LearningPathCard 
+                                    path={item as LearningPath}
+                                    categoryName={categories.find(c => c.id === (item as LearningPath).categoryId)?.name || 'Inconnue'}
+                                    resourceCount={(item as LearningPath).steps.length}
+                                 />
+                              )}
+                           </div>
                         </div>
                      )
                   })}
                </div>
                
-               <div className="flex justify-center">
-                  <Button variant="ghost" size="sm" onClick={() => setAiResults(null)} className="text-muted-foreground">
-                    <X className="w-4 h-4 mr-2" /> Effacer les recommandations IA
-                  </Button>
-               </div>
-               <div className="border-t pt-8" />
+               <div className="border-t border-dashed pt-8 mt-12" />
             </div>
           )}
 
           {/* Stats Cards Section */}
           {!searchResults && !aiResults && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="border-l-4 border-l-success">
+              <Card className="border-l-4 border-l-success shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="flex items-center gap-4 p-6">
                   <div className="p-3 bg-success/10 rounded-full">
                     <Trophy className="w-6 h-6 text-success" />
@@ -272,7 +279,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
               
-              <Card className="border-l-4 border-l-red-500">
+              <Card className="border-l-4 border-l-red-500 shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="flex items-center gap-4 p-6">
                   <div className="p-3 bg-red-500/10 rounded-full">
                     <Heart className="w-6 h-6 text-red-500 fill-red-500" />
@@ -284,7 +291,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-l-4 border-l-primary">
+              <Card className="border-l-4 border-l-primary shadow-sm hover:shadow-md transition-shadow">
                 <CardContent className="flex items-center gap-4 p-6">
                   <div className="p-3 bg-primary/10 rounded-full">
                     <BookOpen className="w-6 h-6 text-primary" />
@@ -300,15 +307,20 @@ export default function DashboardPage() {
 
           {(searchResults && !aiResults) ? (
              <div className="space-y-8">
-                <h3 className="text-2xl font-semibold tracking-tight">
-                    Résultats pour "{searchQuery}"
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-2xl font-semibold tracking-tight">
+                      Résultats pour "{searchQuery}"
+                  </h3>
+                  <Button variant="ghost" size="sm" onClick={() => setSearchQuery("")} className="text-muted-foreground">
+                    <X className="w-4 h-4 mr-2" /> Tout effacer
+                  </Button>
+                </div>
                 
                 {searchResults.paths.length > 0 && (
                     <section>
                         <h4 className="text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
-                            <Milestone className="w-5 h-5" />
-                            Parcours
+                            <Milestone className="w-5 h-5 text-primary" />
+                            Parcours correspondants
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {searchResults.paths.map(path => {
@@ -327,10 +339,10 @@ export default function DashboardPage() {
                 )}
 
                 {searchResults.resources.length > 0 && (
-                     <section>
+                     <section className="mt-8">
                         <h4 className="text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
-                            <BookOpen className="w-5 h-5" />
-                            Ressources
+                            <BookOpen className="w-5 h-5 text-primary" />
+                            Ressources correspondantes
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                             {searchResults.resources.map(resource => (
@@ -341,9 +353,14 @@ export default function DashboardPage() {
                 )}
 
                 {searchResults.paths.length === 0 && searchResults.resources.length === 0 && (
-                    <div className="text-center py-16 text-muted-foreground">
-                        <p className="text-lg font-semibold">Aucun résultat trouvé</p>
-                        <p>Essayez avec d'autres mots-clés ou utilisez la <strong>Recherche IA</strong>.</p>
+                    <div className="text-center py-16 bg-card rounded-2xl border-2 border-dashed">
+                        <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                        <p className="text-lg font-semibold text-muted-foreground">Aucun résultat classique trouvé</p>
+                        <p className="text-muted-foreground mb-6">Essayez d'utiliser le bouton <strong>Conseil IA</strong> pour une recherche plus large.</p>
+                        <Button onClick={handleAISearch} disabled={isAISearching}>
+                          {isAISearching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                          Demander à l'IA
+                        </Button>
                     </div>
                 )}
              </div>
@@ -367,7 +384,7 @@ export default function DashboardPage() {
                                 hideLearningPathForUser(firestore, user.uid, path.id);
                             };
                             return (
-                            <Card key={path.id} className="overflow-hidden group">
+                            <Card key={path.id} className="overflow-hidden group hover:shadow-md transition-all">
                             <CardHeader className="relative">
                                 <div className="flex justify-between items-start">
                                     <div>
