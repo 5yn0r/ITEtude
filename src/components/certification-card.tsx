@@ -35,18 +35,18 @@ export function CertificationCard({ certification }: CertificationCardProps) {
   return (
     <Card className={cn("flex flex-col h-full hover:shadow-lg transition-all duration-300 border-t-4 border-t-primary/20", isExpired && "opacity-60")}>
       <CardHeader>
-        <div className="flex gap-4 items-start">
-            <div className="shrink-0 p-1 bg-white rounded-xl border shadow-sm">
+        <div className="flex gap-5 items-start">
+            <div className="shrink-0 p-2 bg-white rounded-2xl border shadow-sm">
               <Image 
                   src={certification.logoUrl} 
                   alt={`Logo de ${certification.issuingBody}`}
-                  width={64}
-                  height={64}
-                  className="rounded-lg aspect-square object-contain"
+                  width={80}
+                  height={80}
+                  className="rounded-xl aspect-square object-contain"
               />
             </div>
-            <div className='flex-1 space-y-1.5'>
-                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">
+            <div className='flex-1 space-y-2'>
+                <div className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">
                   {certification.issuingBody}
                 </div>
                 <CardTitle className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">
