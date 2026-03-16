@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/tooltip";
 import { aiSearch, type AISearchOutput } from "@/ai/flows/ai-search-flow";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -169,26 +170,26 @@ export default function DashboardPage() {
       <AppHeader title="Mon tableau de bord" />
       <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto overscroll-y-contain">
         {/* Sticky Header with high Z-Index and opaque background */}
-        <div className="sticky top-0 z-40 border-b bg-background pt-2 md:pt-6 shadow-sm">
+        <div className="sticky top-0 z-40 border-b bg-background pt-2 md:pt-4 shadow-sm">
             <div className="px-4 md:px-6 lg:px-8">
                 <div className="flex items-center justify-between gap-2 mb-1 md:mb-2">
                     <div>
-                        <h2 className="text-xl md:text-3xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
-                        <p className="hidden md:block text-sm md:text-base text-muted-foreground">Ravi de vous revoir. Voici un aperçu de vos progrès.</p>
+                        <h2 className="text-lg md:text-2xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
+                        <p className="hidden md:block text-xs md:text-sm text-muted-foreground">Voici un aperçu de vos progrès.</p>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-primary/10 text-primary px-2 py-1 md:px-4 md:py-2 rounded-full border border-primary/20 shrink-0">
-                        <Zap className="w-3.5 h-3.5 md:w-5 md:h-5 fill-primary" />
-                        <span className="font-bold text-[10px] md:text-sm">V2.0</span>
+                    <div className="flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-full border border-primary/20 shrink-0">
+                        <Zap className="w-3 h-3 md:w-4 md:h-4 fill-primary" />
+                        <span className="font-bold text-[9px] md:text-xs">V2.0</span>
                     </div>
                 </div>
                 
-                <div className="relative max-w-2xl mx-auto my-3 md:my-6 flex flex-row gap-2 pb-2 md:pb-4">
+                <div className="relative max-w-2xl mx-auto my-2 md:my-4 flex flex-row gap-2 pb-2 md:pb-3">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
                             placeholder="Rechercher..."
-                            className="pl-9 md:pl-12 w-full rounded-full bg-secondary/30 h-10 md:h-12 text-sm md:text-lg shadow-inner focus:bg-background transition-all"
+                            className="pl-9 w-full rounded-full bg-secondary/30 h-9 md:h-10 text-xs md:text-sm shadow-inner focus:bg-background transition-all"
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -200,9 +201,9 @@ export default function DashboardPage() {
                     <Button 
                         onClick={handleAISearch} 
                         disabled={!searchQuery.trim() || isAISearching}
-                        className="rounded-full h-10 md:h-12 gap-1.5 px-4 md:px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold shrink-0 text-xs md:text-sm"
+                        className="rounded-full h-9 md:h-10 gap-1 px-4 shadow-md hover:shadow-primary/30 transition-all font-bold shrink-0 text-[10px] md:text-xs"
                     >
-                        {isAISearching ? <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" /> : <Sparkles className="w-4 h-4 md:w-5 md:h-5" />}
+                        {isAISearching ? <Loader2 className="w-3 h-3 md:w-4 md:h-4 animate-spin" /> : <Sparkles className="w-3 h-3 md:w-4 md:h-4" />}
                         <span className="hidden sm:inline">Conseil IA</span>
                         <span className="sm:hidden">IA</span>
                     </Button>
@@ -218,7 +219,7 @@ export default function DashboardPage() {
                <div className="flex items-center justify-between">
                   <h3 className="text-xl font-bold flex items-center gap-2 text-primary">
                     <BrainCircuit className="w-6 h-6" />
-                    Recommandations de l'IA
+                    Conseils de l'IA
                   </h3>
                   <Button variant="ghost" size="sm" onClick={() => setAiResults(null)} className="text-muted-foreground hover:text-foreground">
                     <X className="w-4 h-4 mr-2" /> Effacer
@@ -235,7 +236,7 @@ export default function DashboardPage() {
                   </AlertDescription>
                </Alert>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8 mt-12">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-24 gap-x-8 mt-12">
                   {aiResults.recommendations.map((rec) => {
                      const item = rec.type === 'resource' 
                         ? resources.find(r => r.id === rec.id)
@@ -244,16 +245,19 @@ export default function DashboardPage() {
                      if (!item) return null;
 
                      return (
-                        <div key={rec.id} className="group relative flex flex-col pt-16">
-                           {/* Position the badge absolutely with enough offset to not overlap */}
-                           <div className="absolute top-0 left-0 right-0 z-10 px-4 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-t-2xl shadow-sm flex items-start gap-2 min-h-[64px]">
-                              <Sparkles className="w-4 h-4 shrink-0 mt-0.5" />
-                              <div className="flex flex-col gap-0.5">
-                                 <span className="text-[9px] uppercase tracking-wider font-black opacity-80">Pourquoi l'IA recommande :</span>
-                                 <span className="text-xs md:text-sm font-medium leading-tight">{rec.reason}</span>
+                        <div key={rec.id} className="group relative flex flex-col pt-20">
+                           {/* Recommendation Badge with line-clamp */}
+                           <div className="absolute top-0 left-0 right-0 z-10 px-4 py-3 bg-gradient-to-br from-primary/95 to-accent text-primary-foreground rounded-t-2xl shadow-md flex items-start gap-2 min-h-[84px] md:min-h-[92px]">
+                              <Sparkles className="w-4 h-4 shrink-0 mt-1" />
+                              <div className="flex flex-col gap-0.5 overflow-hidden">
+                                 <span className="text-[10px] uppercase tracking-wider font-extrabold opacity-90">Analyse de l'IA</span>
+                                 <span className="text-xs md:text-sm font-medium leading-snug line-clamp-3">
+                                    {rec.reason}
+                                 </span>
                               </div>
                            </div>
-                           <div className="flex-1 rounded-b-2xl ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-lg overflow-hidden bg-background">
+                           {/* Original Resource/Path Card with reinforced presentation */}
+                           <div className="flex-1 rounded-b-2xl border-x-2 border-b-2 border-primary/20 group-hover:border-primary/40 transition-all shadow-sm group-hover:shadow-xl overflow-hidden bg-background">
                               {rec.type === 'resource' ? (
                                  <ResourceCard resource={item as Resource} />
                               ) : (
