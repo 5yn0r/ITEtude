@@ -225,15 +225,17 @@ export default function DashboardPage() {
                   </Button>
                </div>
 
-               <Alert className="bg-primary/5 border-primary/20 shadow-sm border-l-4 border-l-primary">
+               <Alert className="bg-primary/5 border-primary/20 shadow-md border-l-4 border-l-primary overflow-hidden">
                   <Sparkles className="h-5 w-5 text-primary" />
-                  <AlertTitle className="font-bold text-primary">Analyse pédagogique</AlertTitle>
-                  <AlertDescription className="text-foreground/80 leading-relaxed italic mt-1 text-sm md:text-base">
+                  <AlertTitle className="font-bold text-primary flex items-center gap-2">
+                    Analyse pédagogique
+                  </AlertTitle>
+                  <AlertDescription className="text-primary/90 font-medium leading-relaxed mt-2 text-sm md:text-base italic">
                     "{aiResults.summary}"
                   </AlertDescription>
                </Alert>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-8 mt-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-16 gap-x-8 mt-12">
                   {aiResults.recommendations.map((rec) => {
                      const item = rec.type === 'resource' 
                         ? resources.find(r => r.id === rec.id)
@@ -242,13 +244,16 @@ export default function DashboardPage() {
                      if (!item) return null;
 
                      return (
-                        <div key={rec.id} className="group relative flex flex-col pt-12">
+                        <div key={rec.id} className="group relative flex flex-col pt-16">
                            {/* Position the badge absolutely with enough offset to not overlap */}
-                           <div className="absolute top-0 left-0 right-0 z-10 px-3 py-2 bg-primary text-[10px] md:text-[11px] font-bold text-primary-foreground rounded-t-xl shadow-sm transition-transform flex items-center gap-1.5 min-h-[40px]">
-                              <Sparkles className="w-3 h-3 shrink-0" />
-                              <span className="line-clamp-2">POURQUOI : {rec.reason}</span>
+                           <div className="absolute top-0 left-0 right-0 z-10 px-4 py-3 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-t-2xl shadow-sm flex items-start gap-2 min-h-[64px]">
+                              <Sparkles className="w-4 h-4 shrink-0 mt-0.5" />
+                              <div className="flex flex-col gap-0.5">
+                                 <span className="text-[9px] uppercase tracking-wider font-black opacity-80">Pourquoi l'IA recommande :</span>
+                                 <span className="text-xs md:text-sm font-medium leading-tight">{rec.reason}</span>
+                              </div>
                            </div>
-                           <div className="flex-1 rounded-b-xl ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-md overflow-hidden bg-background">
+                           <div className="flex-1 rounded-b-2xl ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-lg overflow-hidden bg-background">
                               {rec.type === 'resource' ? (
                                  <ResourceCard resource={item as Resource} />
                               ) : (
@@ -462,7 +467,7 @@ export default function DashboardPage() {
                                 <div className="flex flex-col flex-1 min-w-0 mr-2">
                                   <p className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base truncate">{resource.title}</p>
                                   <div className="flex flex-wrap items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
-                                      <span className="bg-secondary px-1 py-0.5 rounded truncate max-w-[80px] md:max-w-none">{new URL(resource.url).hostname}</span>
+                                      <span className="bg-secondary px-1.5 py-0.5 rounded truncate max-w-[80px] md:max-w-none">{new URL(resource.url).hostname}</span>
                                       <span>•</span>
                                       <span>{resource.difficulty}</span>
                                       {resource.author && (
