@@ -7,8 +7,6 @@ config();
 
 // Récupération de la clé avec plusieurs fallbacks
 const apiKey = process.env.GEMINI_API_KEY || 
-               process.env.GOOGLE_GENAI_API_KEY || 
-               process.env.GOOGLE_API_KEY || 
                process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
 // Log côté serveur pour débogage (visible dans les logs Vercel ou terminal local)
