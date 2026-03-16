@@ -1,10 +1,9 @@
-
 'use client';
 
 import { AppHeader } from "@/components/app-header";
 import { useUser, useFirestore } from "@/firebase";
 import { useCollection } from "@/firebase/firestore/use-collection";
-import { addDoc, collection, serverTimestamp, query, orderBy, limit } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Loader2, Users as UsersIcon, MessageCircle, X } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 
 type Message = {
   id: string;
@@ -32,7 +31,6 @@ export default function CommunityPage() {
   const [showBanner, setShowBanner] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Utilisation d'une collection dédiée pour les messages communautaires
   const { data: messages, loading } = useCollection<Message>('community_messages');
 
   const sortedMessages = [...messages].sort((a, b) => 
@@ -77,7 +75,6 @@ export default function CommunityPage() {
       <main className="flex-1 flex flex-col min-h-0 bg-secondary/30">
         <div className="flex-1 overflow-hidden p-4 md:p-6 lg:px-8">
           <div className="max-w-4xl mx-auto h-full flex flex-col bg-card rounded-2xl shadow-sm border overflow-hidden">
-            {/* Header de la discussion */}
             <div className="p-4 border-b bg-muted/20 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-primary/10 rounded-full">
@@ -90,7 +87,6 @@ export default function CommunityPage() {
               </div>
             </div>
 
-            {/* Bandeau WhatsApp pour les nouveaux arrivants */}
             {showBanner && (
               <div className="p-3 bg-green-500/10 border-b flex items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
                 <div className="flex items-center gap-3">
@@ -115,7 +111,6 @@ export default function CommunityPage() {
               </div>
             )}
 
-            {/* Zone de messages */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               {loading ? (
                 <div className="flex flex-col items-center justify-center h-full py-20">
@@ -176,7 +171,6 @@ export default function CommunityPage() {
               )}
             </ScrollArea>
 
-            {/* Input d'envoi */}
             <div className="p-4 border-t bg-muted/10">
               <form onSubmit={handleSendMessage} className="flex gap-2 max-w-4xl mx-auto">
                 <Input
