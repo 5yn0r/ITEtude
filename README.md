@@ -16,18 +16,16 @@ ITEtude est une plateforme de curation intelligente qui transforme le chaos info
 
 ## 🌟 Nouveautés de la V2.0
 
--   🤖 **Recherche Assistée par IA** : Trouvez la ressource parfaite grâce à notre assistant pédagogique basé sur Gemini.
--   💬 **Espace Communautaire** : Échangez en temps réel avec les autres membres de la plateforme.
--   📝 **Bloc-notes Personnel** : Enregistrez vos astuces et commandes importantes directement dans votre espace.
--   🔒 **Sécurité Renforcée** : Accès administrateur discret et règles de sécurité Firestore strictes.
+-    **Recherche Assistée par IA** : Trouvez la ressource parfaite grâce à notre assistant pédagogique basé sur Gemini.
+-    **Espace Communautaire** : Échangez en temps réel avec les autres membres de la plateforme.
+-    **Bloc-notes Personnel** : Enregistrez vos astuces et commandes importantes directement dans votre espace.
 
 ## ✨ Fonctionnalités Clés
 
--   📚 **Parcours d'Apprentissage** : Des chemins balisés pour passer de débutant à expert.
--   🔍 **Ressources Qualifiées** : Articles, vidéos et docs triés sur le volet.
--   👤 **Tableau de Bord** : Suivez votre progression, gérez vos favoris et vos notes.
--   ⚙️ **Filtrage Avancé** : Filtrez par difficulté, langue, ou "poids data".
--   🛡️ **Administration** : Interface complète pour la gestion des contenus (via `/postadeep`).
+-    **Parcours d'Apprentissage** : Des chemins balisés pour passer de débutant à expert.
+-    **Ressources Qualifiées** : Articles, vidéos et docs triés sur le volet.
+-    **Tableau de Bord** : Suivez votre progression, gérez vos favoris et vos notes.
+-    **Filtrage Avancé** : Filtrez par difficulté, langue, ou "poids data".
 
 ## 🛠️ Stack Technique
 
@@ -36,7 +34,7 @@ ITEtude est une plateforme de curation intelligente qui transforme le chaos info
 -   **IA** : [Genkit](https://firebase.google.com/docs/genkit) (Google Gemini)
 -   **Styling** : [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/)
 
-## 🚀 Démarrage Rapide
+##  Démarrage Rapide
 
 ### 1. Cloner et Installer
 ```bash
@@ -50,9 +48,7 @@ Créez un fichier `.env.local` avec vos clés Firebase et votre clé Gemini :
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY="..."
 GEMINI_API_KEY="..."
-# ... (voir .env pour la liste complète)
 ```
-
 ### 3. Lancer
 ```bash
 npm run dev
