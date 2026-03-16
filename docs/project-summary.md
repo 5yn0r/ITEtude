@@ -34,5 +34,5 @@
 - **IA Framework** : Genkit v1.x (Google Gemini 2.5 Flash).
 - **Type Safety** : TypeScript, Zod.
 
-## 🚀 Vision Future
+##  Vision Future
 Devenir la plateforme de référence pour l'auto-formation IT en Afrique et dans tout l'espace francophone, en intégrant davantage de gamification et de mentorat.
