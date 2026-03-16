@@ -3,7 +3,7 @@
 import { AppHeader } from "@/components/app-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Milestone, Heart, BookOpen, Search, X, Trophy, Zap, Star } from 'lucide-react';
+import { Milestone, Heart, BookOpen, Search, X, Trophy, Zap, Star, Sparkles, Loader2, BrainCircuit } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/context/favorites-context";
@@ -24,6 +24,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { aiSearch, type AISearchOutput } from "@/ai/flows/ai-search-flow";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function DashboardPage() {
   const { user } = useUser();
@@ -34,6 +36,8 @@ export default function DashboardPage() {
   const { data: userProfile, loading: userProfileLoading } = useDoc<UserProfile>(user ? `users/${user.uid}` : null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAISearching, setIsAISearching] = useState(false);
+  const [aiResults, setAiResults] = useState<AISearchOutput | null>(null);
 
   const loading = favoritesLoading || resourcesLoading || pathsLoading || userProfileLoading;
 
@@ -57,6 +61,27 @@ export default function DashboardPage() {
 
     return { completedPaths, totalFavorites, exploredResources };
   }, [userProgress, learningPaths, loading]);
+
+  const handleAISearch = async () => {
+    if (!searchQuery.trim() || isAISearching) return;
+    
+    setIsAISearching(true);
+    setAiResults(null);
+    try {
+      const results = await aiSearch({
+        query: searchQuery,
+        availableData: {
+          resources: resources.map(r => ({ id: r.id, title: r.title, description: r.description, difficulty: r.difficulty })),
+          paths: learningPaths.map(p => ({ id: p.id, title: p.title, description: p.description, difficulty: p.difficulty })),
+        }
+      });
+      setAiResults(results);
+    } catch (error) {
+      console.error("AI Search Error:", error);
+    } finally {
+      setIsAISearching(false);
+    }
+  };
 
   const userFavoriteResources = useMemo(() => {
     if (loading) return [];
@@ -155,22 +180,85 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 
-                <div className="relative max-w-xl mx-auto my-6">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                        type="search"
-                        placeholder="Rechercher une ressource ou un parcours..."
-                        className="pl-12 w-full rounded-full bg-secondary/30"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                <div className="relative max-w-2xl mx-auto my-6 flex gap-2">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                            type="search"
+                            placeholder="Que voulez-vous apprendre aujourd'hui ?"
+                            className="pl-12 w-full rounded-full bg-secondary/30"
+                            value={searchQuery}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                if (aiResults) setAiResults(null);
+                            }}
+                            onKeyDown={(e) => e.key === 'Enter' && handleAISearch()}
+                        />
+                    </div>
+                    <Button 
+                        onClick={handleAISearch} 
+                        disabled={!searchQuery.trim() || isAISearching}
+                        className="rounded-full gap-2 px-6 shadow-md hover:shadow-primary/20 transition-all"
+                    >
+                        {isAISearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                        Recherche IA
+                    </Button>
                 </div>
             </div>
         </div>
       
         <div className="space-y-8 px-4 md:px-6 lg:px-8 pb-8 mt-6">
+          
+          {/* AI Search Results Section */}
+          {aiResults && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+               <Alert className="bg-primary/5 border-primary/20">
+                  <BrainCircuit className="h-5 w-5 text-primary" />
+                  <AlertTitle className="font-bold text-primary">Conseils de l'IA d'ITEtude</AlertTitle>
+                  <AlertDescription className="text-muted-foreground italic">
+                    "{aiResults.summary}"
+                  </AlertDescription>
+               </Alert>
+
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {aiResults.recommendations.map((rec) => {
+                     const item = rec.type === 'resource' 
+                        ? resources.find(r => r.id === rec.id)
+                        : learningPaths.find(p => p.id === rec.id);
+                     
+                     if (!item) return null;
+
+                     return (
+                        <div key={rec.id} className="space-y-2">
+                           <div className="bg-card p-3 rounded-lg border-2 border-primary/30 text-xs font-semibold text-primary flex items-center gap-2 shadow-sm">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              IA : {rec.reason}
+                           </div>
+                           {rec.type === 'resource' ? (
+                              <ResourceCard resource={item as Resource} />
+                           ) : (
+                              <LearningPathCard 
+                                 path={item as LearningPath}
+                                 categoryName={categories.find(c => c.id === (item as LearningPath).categoryId)?.name || 'Inconnue'}
+                                 resourceCount={(item as LearningPath).steps.length}
+                              />
+                           )}
+                        </div>
+                     )
+                  })}
+               </div>
+               
+               <div className="flex justify-center">
+                  <Button variant="ghost" size="sm" onClick={() => setAiResults(null)} className="text-muted-foreground">
+                    <X className="w-4 h-4 mr-2" /> Effacer les recommandations IA
+                  </Button>
+               </div>
+               <div className="border-t pt-8" />
+            </div>
+          )}
+
           {/* Stats Cards Section */}
-          {!searchResults && (
+          {!searchResults && !aiResults && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="border-l-4 border-l-success">
                 <CardContent className="flex items-center gap-4 p-6">
@@ -210,12 +298,12 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {searchResults ? (
+          {(searchResults && !aiResults) ? (
              <div className="space-y-8">
                 <h3 className="text-2xl font-semibold tracking-tight">
                     Résultats pour "{searchQuery}"
                 </h3>
-                {/* ... (rest of search results logic remains the same) */}
+                
                 {searchResults.paths.length > 0 && (
                     <section>
                         <h4 className="text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
@@ -255,11 +343,11 @@ export default function DashboardPage() {
                 {searchResults.paths.length === 0 && searchResults.resources.length === 0 && (
                     <div className="text-center py-16 text-muted-foreground">
                         <p className="text-lg font-semibold">Aucun résultat trouvé</p>
-                        <p>Essayez avec d'autres mots-clés.</p>
+                        <p>Essayez avec d'autres mots-clés ou utilisez la <strong>Recherche IA</strong>.</p>
                     </div>
                 )}
              </div>
-          ) : (
+          ) : !aiResults && (
             <>
                 <section>
                     <div className="flex items-center justify-between mb-4">
