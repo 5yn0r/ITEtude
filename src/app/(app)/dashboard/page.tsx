@@ -169,7 +169,6 @@ export default function DashboardPage() {
     <>
       <AppHeader title="Mon tableau de bord" />
       <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto overscroll-y-contain">
-        {/* Sticky Header with high Z-Index and opaque background */}
         <div className="sticky top-0 z-40 border-b bg-background pt-2 md:pt-4 shadow-sm">
             <div className="px-4 md:px-6 lg:px-8">
                 <div className="flex items-center justify-between gap-2 mb-1 md:mb-2">
@@ -236,7 +235,7 @@ export default function DashboardPage() {
                   </AlertDescription>
                </Alert>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-24 gap-x-8 mt-12">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
                   {aiResults.recommendations.map((rec) => {
                      const item = rec.type === 'resource' 
                         ? resources.find(r => r.id === rec.id)
@@ -245,19 +244,22 @@ export default function DashboardPage() {
                      if (!item) return null;
 
                      return (
-                        <div key={rec.id} className="group relative flex flex-col pt-20">
-                           {/* Recommendation Badge with line-clamp */}
-                           <div className="absolute top-0 left-0 right-0 z-10 px-4 py-3 bg-gradient-to-br from-primary/95 to-accent text-primary-foreground rounded-t-2xl shadow-md flex items-start gap-2 min-h-[84px] md:min-h-[92px]">
-                              <Sparkles className="w-4 h-4 shrink-0 mt-1" />
-                              <div className="flex flex-col gap-0.5 overflow-hidden">
-                                 <span className="text-[10px] uppercase tracking-wider font-extrabold opacity-90">Analyse de l'IA</span>
-                                 <span className="text-xs md:text-sm font-medium leading-snug line-clamp-3">
-                                    {rec.reason}
-                                 </span>
+                        <div key={rec.id} className="group flex flex-col h-full bg-background rounded-2xl shadow-sm border-2 border-primary/10 hover:border-primary/30 transition-all hover:shadow-xl overflow-hidden">
+                           {/* Recommendation Header */}
+                           <div className="p-4 bg-gradient-to-br from-primary/95 to-accent text-primary-foreground">
+                              <div className="flex items-start gap-2">
+                                 <Sparkles className="w-4 h-4 shrink-0 mt-1" />
+                                 <div className="flex flex-col gap-0.5">
+                                    <span className="text-[10px] uppercase tracking-wider font-extrabold opacity-90">Analyse de l'IA</span>
+                                    <span className="text-xs md:text-sm font-medium leading-relaxed">
+                                       {rec.reason}
+                                    </span>
+                                 </div>
                               </div>
                            </div>
-                           {/* Original Resource/Path Card with reinforced presentation */}
-                           <div className="flex-1 rounded-b-2xl border-x-2 border-b-2 border-primary/20 group-hover:border-primary/40 transition-all shadow-sm group-hover:shadow-xl overflow-hidden bg-background">
+                           
+                           {/* Original Resource/Path Card Content */}
+                           <div className="flex-1 flex flex-col">
                               {rec.type === 'resource' ? (
                                  <ResourceCard resource={item as Resource} />
                               ) : (
