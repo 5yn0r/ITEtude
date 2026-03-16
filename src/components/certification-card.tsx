@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Certification, Difficulty, CertificationStatus } from "@/lib/types";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Award } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { categories } from '@/lib/data';
 import { format } from "date-fns";
@@ -33,49 +33,61 @@ export function CertificationCard({ certification }: CertificationCardProps) {
   const isExpired = certification.expiresAt && certification.expiresAt.toDate() < new Date();
 
   return (
-    <Card className={cn("flex flex-col h-full hover:shadow-md transition-shadow", isExpired && "opacity-60")}>
+    <Card className={cn("flex flex-col h-full hover:shadow-lg transition-all duration-300 border-t-4 border-t-primary/20", isExpired && "opacity-60")}>
       <CardHeader>
         <div className="flex gap-4 items-start">
-            <Image 
-                src={certification.logoUrl} 
-                alt={`Logo de ${certification.issuingBody}`}
-                width={64}
-                height={64}
-                className="rounded-md border p-1 aspect-square object-contain"
-            />
-            <div className='flex-1'>
-                <CardTitle className="text-lg">{certification.title}</CardTitle>
-                <CardDescription>{certification.issuingBody}</CardDescription>
+            <div className="shrink-0 p-1 bg-white rounded-xl border shadow-sm">
+              <Image 
+                  src={certification.logoUrl} 
+                  alt={`Logo de ${certification.issuingBody}`}
+                  width={64}
+                  height={64}
+                  className="rounded-lg aspect-square object-contain"
+              />
+            </div>
+            <div className='flex-1 space-y-1.5'>
+                <div className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-primary/10 text-primary border border-primary/20">
+                  {certification.issuingBody}
+                </div>
+                <CardTitle className="text-xl font-bold leading-tight group-hover:text-primary transition-colors">
+                  {certification.title}
+                </CardTitle>
             </div>
         </div>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
-        <p className="text-sm text-muted-foreground">
-          {certification.description || "Aucune description disponible."}
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {certification.description || "Aucune description disponible pour cette certification."}
         </p>
         <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className={cn(difficultyStyles[certification.difficulty])}>{certification.difficulty}</Badge>
-            {category && <Badge variant="secondary">{category.name}</Badge>}
-            <Badge variant="secondary">{certification.language}</Badge>
-            <Badge variant="outline" className={cn(statusStyles[certification.status])}>{certification.status}</Badge>
+            <Badge variant="outline" className={cn("font-bold", difficultyStyles[certification.difficulty])}>{certification.difficulty}</Badge>
+            {category && <Badge variant="secondary" className="font-semibold">{category.name}</Badge>}
+            <Badge variant="secondary" className="font-semibold">{certification.language}</Badge>
+            <Badge variant="outline" className={cn("font-bold", statusStyles[certification.status])}>{certification.status}</Badge>
         </div>
-         <div className="text-xs text-muted-foreground space-y-1 pt-2 border-t mt-4">
+         <div className="text-xs text-muted-foreground space-y-2 pt-4 border-t mt-4 bg-secondary/20 p-3 rounded-lg">
             {certification.issuedAt && (
-                <p>Commencé le : <span className="font-medium text-foreground">{format(certification.issuedAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span></p>
+                <div className="flex justify-between items-center">
+                  <span>Commencé le</span>
+                  <span className="font-bold text-foreground">{format(certification.issuedAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span>
+                </div>
             )}
-            {isExpired ? (
-                 <p className="font-semibold text-destructive">Expiré le : {format(certification.expiresAt.toDate(), 'd MMMM yyyy', { locale: fr })}</p>
-            ) : certification.expiresAt ? (
-                <p>Expire le : <span className="font-medium text-foreground">{format(certification.expiresAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span></p>
-            ) : (
-                <p>Expiration : <span className="font-medium text-foreground">Non applicable</span></p>
-            )}
+            <div className="flex justify-between items-center">
+              <span>Statut expiration</span>
+              {isExpired ? (
+                   <span className="font-black text-destructive uppercase tracking-tighter">Expiré</span>
+              ) : certification.expiresAt ? (
+                  <span className="font-bold text-foreground">{format(certification.expiresAt.toDate(), 'd MMMM yyyy', { locale: fr })}</span>
+              ) : (
+                  <span className="font-medium text-muted-foreground">À vie / N/A</span>
+              )}
+            </div>
         </div>
       </CardContent>
       <CardFooter>
-        <Button asChild className="w-full" disabled={isExpired}>
+        <Button asChild className="w-full font-bold shadow-md hover:shadow-primary/20" disabled={isExpired}>
           <a href={certification.url} target="_blank" rel="noopener noreferrer">
-            Voir la certification
+            Accéder à la certification
             <ArrowUpRight className="ml-2 h-4 w-4" />
           </a>
         </Button>
