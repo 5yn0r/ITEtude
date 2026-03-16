@@ -167,26 +167,27 @@ export default function DashboardPage() {
     <>
       <AppHeader title="Mon tableau de bord" />
       <main className="flex-1 min-h-0 bg-secondary/50 overflow-y-auto overscroll-y-contain">
-        <div className="sticky top-0 z-10 border-b bg-background pt-4 md:pt-6 lg:pt-8">
+        {/* Sticky Header with high Z-Index and opaque background */}
+        <div className="sticky top-0 z-40 border-b bg-background pt-4 md:pt-6 lg:pt-8 shadow-sm">
             <div className="px-4 md:px-6 lg:px-8">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
                     <div>
-                        <h2 className="text-3xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
-                        <p className="text-muted-foreground">Ravi de vous revoir. Voici un aperçu de vos progrès.</p>
+                        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Bonjour, {user?.displayName || 'Apprenant'} !</h2>
+                        <p className="text-sm md:text-base text-muted-foreground">Ravi de vous revoir. Voici un aperçu de vos progrès.</p>
                     </div>
                     <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 self-start md:self-auto">
                         <Zap className="w-5 h-5 fill-primary" />
-                        <span className="font-bold">Version 2.0</span>
+                        <span className="font-bold text-sm">Version 2.0</span>
                     </div>
                 </div>
                 
-                <div className="relative max-w-2xl mx-auto my-6 flex gap-2 pb-4">
+                <div className="relative max-w-2xl mx-auto my-6 flex flex-col sm:flex-row gap-2 pb-4">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Que voulez-vous apprendre aujourd'hui ?"
-                            className="pl-12 w-full rounded-full bg-secondary/30 h-12 text-lg shadow-inner focus:bg-background transition-all"
+                            placeholder="Que voulez-vous apprendre ?"
+                            className="pl-12 w-full rounded-full bg-secondary/30 h-12 text-base md:text-lg shadow-inner focus:bg-background transition-all"
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
@@ -198,7 +199,7 @@ export default function DashboardPage() {
                     <Button 
                         onClick={handleAISearch} 
                         disabled={!searchQuery.trim() || isAISearching}
-                        className="rounded-full h-12 gap-2 px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold"
+                        className="rounded-full h-12 gap-2 px-8 shadow-lg hover:shadow-primary/30 transition-all font-bold shrink-0"
                     >
                         {isAISearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
                         Conseil IA
@@ -225,12 +226,12 @@ export default function DashboardPage() {
                <Alert className="bg-primary/5 border-primary/20 shadow-sm border-l-4 border-l-primary">
                   <Sparkles className="h-5 w-5 text-primary" />
                   <AlertTitle className="font-bold text-primary">Analyse pédagogique</AlertTitle>
-                  <AlertDescription className="text-foreground/80 leading-relaxed italic mt-1">
+                  <AlertDescription className="text-foreground/80 leading-relaxed italic mt-1 text-sm md:text-base">
                     "{aiResults.summary}"
                   </AlertDescription>
                </Alert>
 
-               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-8 mt-8">
                   {aiResults.recommendations.map((rec) => {
                      const item = rec.type === 'resource' 
                         ? resources.find(r => r.id === rec.id)
@@ -239,12 +240,13 @@ export default function DashboardPage() {
                      if (!item) return null;
 
                      return (
-                        <div key={rec.id} className="group relative flex flex-col pt-6">
-                           <div className="absolute top-0 left-4 z-10 px-3 py-1 bg-primary text-[11px] font-bold text-primary-foreground rounded-t-lg shadow-sm transform -translate-y-1 group-hover:-translate-y-2 transition-transform flex items-center gap-1.5">
-                              <Sparkles className="w-3 h-3" />
-                              POURQUOI : {rec.reason}
+                        <div key={rec.id} className="group relative flex flex-col pt-12">
+                           {/* Position the badge absolutely with enough offset to not overlap */}
+                           <div className="absolute top-0 left-0 right-0 z-10 px-3 py-2 bg-primary text-[10px] md:text-[11px] font-bold text-primary-foreground rounded-t-xl shadow-sm transition-transform flex items-center gap-1.5 min-h-[40px]">
+                              <Sparkles className="w-3 h-3 shrink-0" />
+                              <span className="line-clamp-2">POURQUOI : {rec.reason}</span>
                            </div>
-                           <div className="flex-1 rounded-xl ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-md overflow-hidden bg-background">
+                           <div className="flex-1 rounded-b-xl ring-2 ring-primary/10 group-hover:ring-primary/40 transition-all shadow-sm group-hover:shadow-md overflow-hidden bg-background">
                               {rec.type === 'resource' ? (
                                  <ResourceCard resource={item as Resource} />
                               ) : (
@@ -308,7 +310,7 @@ export default function DashboardPage() {
           {(searchResults && !aiResults) ? (
              <div className="space-y-8">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-semibold tracking-tight">
+                  <h3 className="text-xl md:text-2xl font-semibold tracking-tight">
                       Résultats pour "{searchQuery}"
                   </h3>
                   <Button variant="ghost" size="sm" onClick={() => setSearchQuery("")} className="text-muted-foreground">
@@ -318,7 +320,7 @@ export default function DashboardPage() {
                 
                 {searchResults.paths.length > 0 && (
                     <section>
-                        <h4 className="text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
+                        <h4 className="text-lg md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
                             <Milestone className="w-5 h-5 text-primary" />
                             Parcours correspondants
                         </h4>
@@ -340,7 +342,7 @@ export default function DashboardPage() {
 
                 {searchResults.resources.length > 0 && (
                      <section className="mt-8">
-                        <h4 className="text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
+                        <h4 className="text-lg md:text-xl font-semibold tracking-tight flex items-center gap-2 mb-4">
                             <BookOpen className="w-5 h-5 text-primary" />
                             Ressources correspondantes
                         </h4>
@@ -368,7 +370,7 @@ export default function DashboardPage() {
             <>
                 <section>
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+                        <h3 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
                             <Milestone className="w-6 h-6 text-primary" />
                             Mes Parcours
                         </h3>
@@ -388,7 +390,7 @@ export default function DashboardPage() {
                             <CardHeader className="relative">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <CardTitle className="group-hover:text-primary transition-colors">{path.title}</CardTitle>
+                                        <CardTitle className="group-hover:text-primary transition-colors text-lg">{path.title}</CardTitle>
                                         <CardDescription>Étape {path.currentStep} sur {path.totalSteps}</CardDescription>
                                     </div>
                                     <TooltipProvider>
@@ -445,7 +447,7 @@ export default function DashboardPage() {
 
                 <section>
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+                        <h3 className="text-xl md:text-2xl font-semibold tracking-tight flex items-center gap-2">
                             <Heart className="w-6 h-6 text-red-500" />
                             Mes Favoris
                         </h3>
@@ -456,8 +458,8 @@ export default function DashboardPage() {
                           <Card key={resource.id} className="hover:border-primary/50 transition-all group shadow-sm">
                               <CardContent className="p-4 flex justify-between items-center">
                                 <div className="flex flex-col">
-                                  <p className="font-semibold group-hover:text-primary transition-colors">{resource.title}</p>
-                                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                  <p className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base">{resource.title}</p>
+                                  <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
                                       <span className="bg-secondary px-1.5 py-0.5 rounded">{new URL(resource.url).hostname}</span>
                                       <span>•</span>
                                       <span>{resource.difficulty}</span>
