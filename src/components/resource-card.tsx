@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Resource, DataWeight, Difficulty } from "@/lib/types";
-import { ArrowUpRight, Heart } from "lucide-react";
+import { ArrowUpRight, Heart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -37,10 +37,22 @@ export function ResourceCard({ resource }: ResourceCardProps) {
   const favorite = isFavorite(resource.id);
 
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-full group hover:border-primary/50 transition-all duration-300">
       <CardHeader>
-        <CardTitle className="text-lg">{resource.title}</CardTitle>
-        <CardDescription>{new URL(resource.url).hostname}</CardDescription>
+        <CardTitle className="text-lg group-hover:text-primary transition-colors">{resource.title}</CardTitle>
+        <div className="flex flex-col gap-1">
+          <CardDescription className="flex items-center gap-1.5">
+            <span className="bg-secondary px-1.5 py-0.5 rounded text-[10px] font-medium uppercase tracking-tight">
+              {new URL(resource.url).hostname}
+            </span>
+          </CardDescription>
+          {resource.author && (
+            <div className="flex items-center gap-1 text-[11px] text-muted-foreground italic font-medium">
+              <User className="w-3 h-3" />
+              <span>Par {resource.author}</span>
+            </div>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <p className="text-sm text-muted-foreground md:line-clamp-3">
@@ -57,7 +69,7 @@ export function ResourceCard({ resource }: ResourceCardProps) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={() => toggleFavorite(resource.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => toggleFavorite(resource.id)} className="hover:bg-red-50">
                     <Heart className={cn("h-5 w-5 transition-colors", favorite ? 'text-red-500 fill-red-500' : 'text-muted-foreground hover:text-red-500')} />
                     <span className="sr-only">{favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}</span>
                   </Button>
