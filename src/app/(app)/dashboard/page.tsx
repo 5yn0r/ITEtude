@@ -1,9 +1,10 @@
+
 'use client'
 
 import { AppHeader } from "@/components/app-header";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Milestone, Heart, BookOpen, Search, X, Trophy, Zap, Star, Sparkles, Loader2, BrainCircuit } from 'lucide-react';
+import { Milestone, Heart, BookOpen, Search, X, Trophy, Zap, Star, Sparkles, Loader2, BrainCircuit, User } from 'lucide-react';
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useFavorites } from "@/context/favorites-context";
@@ -460,10 +461,19 @@ export default function DashboardPage() {
                               <CardContent className="p-3 md:p-4 flex justify-between items-center">
                                 <div className="flex flex-col flex-1 min-w-0 mr-2">
                                   <p className="font-semibold group-hover:text-primary transition-colors text-sm md:text-base truncate">{resource.title}</p>
-                                  <div className="flex items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
+                                  <div className="flex flex-wrap items-center gap-2 text-[10px] md:text-xs text-muted-foreground">
                                       <span className="bg-secondary px-1 py-0.5 rounded truncate max-w-[80px] md:max-w-none">{new URL(resource.url).hostname}</span>
                                       <span>•</span>
                                       <span>{resource.difficulty}</span>
+                                      {resource.author && (
+                                        <>
+                                          <span>•</span>
+                                          <span className="flex items-center gap-1 italic">
+                                            <User className="w-3 h-3" />
+                                            {resource.author}
+                                          </span>
+                                        </>
+                                      )}
                                   </div>
                                 </div>
                                 <div className="flex items-center gap-1.5 md:gap-2 shrink-0">

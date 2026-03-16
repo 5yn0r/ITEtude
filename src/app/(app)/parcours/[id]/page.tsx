@@ -1,3 +1,4 @@
+
 'use client';
 
 import { AppHeader } from "@/components/app-header";
@@ -6,7 +7,7 @@ import { notFound } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle, Milestone, ArrowUpRight, RefreshCcw } from "lucide-react";
+import { CheckCircle2, Circle, Milestone, ArrowUpRight, RefreshCcw, User } from "lucide-react";
 import Link from 'next/link';
 import { useFavorites } from "@/context/favorites-context";
 import { useDoc } from "@/firebase/firestore/use-doc";
@@ -191,8 +192,16 @@ export default function LearningPathDetailPage({ params }: { params: { id: strin
                             <p className="font-semibold">{resource.title}</p>
                             {resource.description && <p className="text-sm text-muted-foreground mt-1">{resource.description}</p>}
                             <div className="flex items-center flex-wrap gap-2 text-sm text-muted-foreground mt-2">
-                                <span>{new URL(resource.url).hostname}</span>
-                                <Badge variant="outline" className="py-0">{resource.dataWeight}</Badge>
+                                <span className="bg-secondary px-1.5 py-0.5 rounded text-[10px] font-medium tracking-tight">
+                                  {new URL(resource.url).hostname}
+                                </span>
+                                {resource.author && (
+                                  <span className="flex items-center gap-1 text-[11px] font-medium italic">
+                                    <User className="w-3 h-3" />
+                                    Par {resource.author}
+                                  </span>
+                                )}
+                                <Badge variant="outline" className="py-0 h-5 text-[10px]">{resource.dataWeight}</Badge>
                             </div>
                         </div>
                     </div>
@@ -236,5 +245,3 @@ export default function LearningPathDetailPage({ params }: { params: { id: strin
     </>
   );
 }
-
-    
