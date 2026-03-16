@@ -12,7 +12,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth, useFirestore } from "@/firebase";
 import { signUpWithEmail, signInWithGoogle } from "@/firebase/auth/auth";
-import { Compass, Loader2 } from "lucide-react";
+import { Compass, Loader2, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const formSchema = z.object({
   displayName: z.string().min(3, { message: "Le nom doit contenir au moins 3 caractères." }),
@@ -25,6 +26,7 @@ export default function SignupPage() {
   const { toast } = useToast();
   const auth = useAuth();
   const firestore = useFirestore();
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -123,7 +125,30 @@ export default function SignupPage() {
                   <FormItem>
                     <FormLabel>Mot de passe</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <div className="relative">
+                        <Input 
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="••••••••"
+                          {...field} 
+                          className="pr-10"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent text-muted-foreground"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                          <span className="sr-only">
+                            {showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                          </span>
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
