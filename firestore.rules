@@ -4,53 +4,57 @@ service cloud.firestore {
   match /databases/{database}/documents {
     
     function isAdmin() {
-      return exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
     match /admins/{userId} {
-      allow read: if request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if false;
     }
 
     match /users/{userId} {
+      // Un utilisateur peut lire tous les profils (pour les noms d'auteurs par ex) 
+      // mais ne peut modifier que le sien.
       allow read: if request.auth != null;
-      allow create, update: if request.auth.uid == userId;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+      
+      // Règles pour les sous-collections privées
+      match /notes/{noteId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      match /progress/{resourceId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
     }
 
     match /resources/{resourceId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && isAdmin();
+      allow write: if isAdmin();
     }
 
     match /learningPaths/{pathId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && isAdmin();
+      allow write: if isAdmin();
     }
 
     match /certifications/{certId} {
       allow read: if request.auth != null;
-      allow write: if request.auth != null && isAdmin();
+      allow write: if isAdmin();
+    }
+    
+    match /feedback/{feedbackId} {
+        allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+        allow read, update, delete: if isAdmin();
     }
 
-    // This rule allows a user to read and write to their own progress documents.
-    match /users/{userId}/progress/{resourceId} {
-      allow read, write: if request.auth.uid == userId;
-    }
-
-    // This rule allows a user to manage their own notes.
-    match /users/{userId}/notes/{noteId} {
-      allow read, write: if request.auth.uid == userId;
-    }
-
-    // This rule allows an admin to read any progress document, which is necessary
-    // for collection group queries used in the admin dashboard.
+    // Autoriser les requêtes de groupe de collection pour les administrateurs (dashboard)
     match /{path=**}/progress/{resourceId} {
       allow read: if isAdmin();
     }
     
-    match /feedback/{feedbackId} {
-        allow create: if request.auth.uid != null && request.auth.uid == request.resource.data.userId;
-        allow read, update, delete: if isAdmin();
+    match /{path=**}/notes/{noteId} {
+      allow read: if isAdmin();
     }
   }
 }
