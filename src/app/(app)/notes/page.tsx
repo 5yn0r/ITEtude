@@ -1,4 +1,3 @@
-
 'use client';
 
 import { AppHeader } from "@/components/app-header";
@@ -9,7 +8,7 @@ import { useUser, useFirestore } from "@/firebase";
 import { addDoc, collection, serverTimestamp, doc, updateDoc, deleteDoc } from "firebase/firestore";
 import { errorEmitter } from '@/firebase/error-emitter';
 import { FirestorePermissionError } from '@/firebase/errors';
-import { PlusCircle, Pencil, Trash2, StickyNote, Loader2, Calendar } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, StickyNote, Loader2, Calendar, FileText, Clock } from "lucide-react";
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -23,6 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { Note } from "@/lib/types";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -140,7 +140,7 @@ export default function NotesPage() {
                 <Skeleton className="h-10 w-32" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map(i => <Skeleton key={i} className="h-48 w-full" />)}
+                {[1, 2, 3].map(i => <Skeleton key={i} className="h-48 w-full rounded-xl" />)}
               </div>
            </div>
         </main>
@@ -152,7 +152,7 @@ export default function NotesPage() {
     <>
       <AppHeader title="Mes Notes" />
       <main className="flex-1 min-h-0 p-4 md:p-6 lg:p-8 bg-secondary/50 overflow-y-auto overscroll-y-contain">
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-3xl font-bold tracking-tight">Mon Bloc-notes</h2>
@@ -161,14 +161,17 @@ export default function NotesPage() {
             
             <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
+                <Button className="shadow-lg hover:shadow-primary/20 transition-all">
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Nouvelle note
                 </Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                  <DialogTitle>Créer une note</DialogTitle>
+                  <DialogTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-primary" />
+                    Créer une note
+                  </DialogTitle>
                   <DialogDescription>Ajoutez une nouvelle note à votre bloc-notes personnel.</DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -180,7 +183,7 @@ export default function NotesPage() {
                         <FormItem>
                           <FormLabel>Titre</FormLabel>
                           <FormControl>
-                            <Input placeholder="Titre de la note" {...field} />
+                            <Input placeholder="Titre de la note..." {...field} className="bg-secondary/20" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -193,15 +196,15 @@ export default function NotesPage() {
                         <FormItem>
                           <FormLabel>Contenu</FormLabel>
                           <FormControl>
-                            <Textarea placeholder="Écrivez votre contenu ici..." rows={6} {...field} />
+                            <Textarea placeholder="Écrivez vos pensées ici..." rows={6} {...field} className="bg-secondary/20 resize-none" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                     <DialogFooter>
-                      <Button type="submit" disabled={form.formState.isSubmitting}>
-                        {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Enregistrer"}
+                      <Button type="submit" disabled={form.formState.isSubmitting} className="w-full sm:w-auto">
+                        {form.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Enregistrer la note"}
                       </Button>
                     </DialogFooter>
                   </form>
@@ -212,41 +215,79 @@ export default function NotesPage() {
 
           {notes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {notes.sort((a, b) => b.updatedAt?.toMillis() - a.updatedAt?.toMillis()).map(note => (
-                <Card key={note.id} className="flex flex-col h-full hover:shadow-md transition-shadow">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg line-clamp-1">{note.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-1 text-xs">
-                       <Calendar className="w-3 h-3" />
-                       Dernière mise à jour le {note.updatedAt ? format(note.updatedAt.toDate(), 'd MMMM yyyy', { locale: fr }) : ''}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">
-                      {note.content}
-                    </p>
-                  </CardContent>
-                  <CardFooter className="pt-3 border-t flex justify-end gap-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleOpenEdit(note)}>
-                      <Pencil className="h-4 w-4" />
-                      <span className="sr-only">Modifier</span>
-                    </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingNoteId(note.id)}>
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Supprimer</span>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ))}
+              {notes.sort((a, b) => b.updatedAt?.toMillis() - a.updatedAt?.toMillis()).map((note, index) => {
+                // Alternance de couleurs subtiles pour les bordures
+                const colors = ["border-t-primary", "border-t-success", "border-t-orange-400", "border-t-indigo-400"];
+                const borderColor = colors[index % colors.length];
+
+                return (
+                  <Card key={note.id} className={cn(
+                    "flex flex-col h-full border-t-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card rounded-xl overflow-hidden group",
+                    borderColor
+                  )}>
+                    <CardHeader className="pb-3">
+                      <div className="flex justify-between items-start gap-2">
+                        <CardTitle className="text-lg font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                          {note.title}
+                        </CardTitle>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground font-medium">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {note.updatedAt ? format(note.updatedAt.toDate(), 'd MMMM yyyy', { locale: fr }) : ''}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/70">
+                          <Clock className="w-3 h-3" />
+                          Mis à jour à {note.updatedAt ? format(note.updatedAt.toDate(), 'HH:mm', { locale: fr }) : ''}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="flex-grow">
+                      <div className="relative">
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-[6]">
+                          {note.content}
+                        </p>
+                        {note.content.split('\n').length > 6 && (
+                          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent" />
+                        )}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="pt-3 pb-4 px-6 border-t bg-secondary/10 flex justify-end gap-2">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-3 text-muted-foreground hover:text-primary hover:bg-primary/5 transition-colors" 
+                        onClick={() => handleOpenEdit(note)}
+                      >
+                        <Pencil className="h-4 w-4 mr-1.5" />
+                        Modifier
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-8 px-3 text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors" 
+                        onClick={() => setDeletingNoteId(note.id)}
+                      >
+                        <Trash2 className="h-4 w-4 mr-1.5" />
+                        Supprimer
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 bg-card rounded-lg border border-dashed border-muted-foreground/25">
-               <StickyNote className="h-12 w-12 text-muted-foreground/50 mb-4" />
-               <p className="text-lg font-medium">Votre bloc-notes est vide</p>
-               <p className="text-sm text-muted-foreground mb-6">Commencez par créer votre première note.</p>
-               <Button onClick={() => setIsCreateDialogOpen(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Nouvelle note
+            <div className="flex flex-col items-center justify-center py-24 bg-card rounded-3xl border-2 border-dashed border-muted-foreground/20 shadow-inner">
+               <div className="bg-primary/5 p-6 rounded-full mb-6">
+                 <StickyNote className="h-16 w-16 text-primary/40" />
+               </div>
+               <p className="text-xl font-bold text-foreground mb-2">Votre bloc-notes est vide</p>
+               <p className="text-sm text-muted-foreground mb-8 text-center max-w-sm px-4">
+                  Besoin de noter une commande Linux ou une astuce React ? C'est l'endroit idéal pour garder vos connaissances à portée de main.
+               </p>
+               <Button onClick={() => setIsCreateDialogOpen(true)} className="rounded-full px-8">
+                  <PlusCircle className="mr-2 h-5 w-5" />
+                  Créer ma première note
                </Button>
             </div>
           )}
@@ -257,7 +298,10 @@ export default function NotesPage() {
       <Dialog open={!!editingNote} onOpenChange={(open) => !open && setEditingNote(null)}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Modifier la note</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="w-5 h-5 text-primary" />
+              Modifier la note
+            </DialogTitle>
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4 py-4">
@@ -268,7 +312,7 @@ export default function NotesPage() {
                   <FormItem>
                     <FormLabel>Titre</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input {...field} className="bg-secondary/20" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -281,15 +325,15 @@ export default function NotesPage() {
                   <FormItem>
                     <FormLabel>Contenu</FormLabel>
                     <FormControl>
-                      <Textarea rows={8} {...field} />
+                      <Textarea rows={8} {...field} className="bg-secondary/20 resize-none" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <DialogFooter>
-                <Button type="submit" disabled={editForm.formState.isSubmitting}>
-                  {editForm.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Mettre à jour"}
+                <Button type="submit" disabled={editForm.formState.isSubmitting} className="w-full sm:w-auto">
+                  {editForm.formState.isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Mettre à jour la note"}
                 </Button>
               </DialogFooter>
             </form>
@@ -299,17 +343,20 @@ export default function NotesPage() {
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deletingNoteId} onOpenChange={(open) => !open && setDeletingNoteId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer cette note ?</AlertDialogTitle>
+            <AlertDialogTitle className="text-destructive flex items-center gap-2">
+              <Trash2 className="w-5 h-5" />
+              Supprimer cette note ?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              Cette action est irréversible. Votre note sera définitivement supprimée.
+              Cette action est irréversible. Votre note sera définitivement supprimée de votre espace personnel.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Supprimer
+          <AlertDialogFooter className="mt-4">
+            <AlertDialogCancel className="rounded-xl">Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-xl">
+              Confirmer la suppression
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
