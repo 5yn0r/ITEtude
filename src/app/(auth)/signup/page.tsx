@@ -94,7 +94,7 @@ export default function SignupPage() {
           <Compass className="w-8 h-8 text-primary" />
           <span className="text-2xl font-bold text-foreground font-headline">ITEtude</span>
       </Link>
-      <Card className="w-full max-w-sm px-4">
+      <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="text-center">
           <CardTitle>Inscription</CardTitle>
           <CardDescription>Créez un compte pour commencer à apprendre</CardDescription>
@@ -195,10 +195,10 @@ export default function SignupPage() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+        <CardFooter className="flex justify-center text-sm text-muted-foreground pb-6">
           <p>
               Vous avez déjà un compte ?{" "}
-              <Link href="/login" className="text-primary hover:underline">
+              <Link href="/login" className="text-primary hover:underline font-semibold">
                   Se connecter
               </Link>
           </p>

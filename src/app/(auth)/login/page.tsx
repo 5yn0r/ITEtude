@@ -36,7 +36,7 @@ function GoogleIcon() {
         fill="#FBBC05"
       />
       <path
-        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         fill="#EA4335"
       />
     </svg>
@@ -92,7 +92,7 @@ export default function LoginPage() {
         <Compass className="w-8 h-8 text-primary" />
         <span className="text-2xl font-bold text-foreground font-headline">ITEtude</span>
       </Link>
-      <Card className="w-full max-sm px-4">
+      <Card className="w-full max-w-sm mx-auto">
         <CardHeader className="text-center">
           <CardTitle>Connexion</CardTitle>
           <CardDescription>Accédez à votre tableau de bord</CardDescription>
@@ -180,10 +180,10 @@ export default function LoginPage() {
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
+        <CardFooter className="flex justify-center text-sm text-muted-foreground pb-6">
           <p>
             Pas encore de compte ?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link href="/signup" className="text-primary hover:underline font-semibold">
               S'inscrire
             </Link>
           </p>
