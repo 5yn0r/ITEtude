@@ -214,20 +214,19 @@ export default function NotesPage() {
           </div>
 
           {notes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
               {notes.sort((a, b) => b.updatedAt?.toMillis() - a.updatedAt?.toMillis()).map((note, index) => {
-                // Alternance de couleurs subtiles pour les bordures
                 const colors = ["border-t-primary", "border-t-success", "border-t-orange-400", "border-t-indigo-400"];
                 const borderColor = colors[index % colors.length];
 
                 return (
                   <Card key={note.id} className={cn(
-                    "flex flex-col h-full border-t-4 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-card rounded-xl overflow-hidden group",
+                    "flex flex-col h-full border-t-4 transition-all duration-300 hover:shadow-xl bg-card rounded-xl overflow-hidden group",
                     borderColor
                   )}>
                     <CardHeader className="pb-3">
                       <div className="flex justify-between items-start gap-2">
-                        <CardTitle className="text-lg font-bold line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+                        <CardTitle className="text-lg font-bold leading-tight group-hover:text-primary transition-colors">
                           {note.title}
                         </CardTitle>
                       </div>
@@ -243,14 +242,9 @@ export default function NotesPage() {
                       </div>
                     </CardHeader>
                     <CardContent className="flex-grow">
-                      <div className="relative">
-                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap line-clamp-[6]">
-                          {note.content}
-                        </p>
-                        {note.content.split('\n').length > 6 && (
-                          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent" />
-                        )}
-                      </div>
+                      <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                        {note.content}
+                      </p>
                     </CardContent>
                     <CardFooter className="pt-3 pb-4 px-6 border-t bg-secondary/10 flex justify-end gap-2">
                       <Button 
