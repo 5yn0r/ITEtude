@@ -1,71 +1,74 @@
 'use server';
 /**
- * @fileOverview A flow to check the status of a URL.
+ * @fileOverview Un flux pour vérifier le statut d'une URL.
  *
- * - checkLink - A function that fetches a URL and returns its status.
- * - CheckLinkInput - The input type for the checkLink function.
- * - CheckLinkOutput - The return type for the checkLink function.
+ * - checkLink - Une fonction qui récupère une URL et renvoie son statut.
+ * - CheckLinkInput - Le type d'entrée pour la fonction checkLink.
+ * - CheckLinkOutput - Le type de retour pour la fonction checkLink.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
 const CheckLinkInputSchema = z.object({
-  url: z.string().url().describe('The URL to check.'),
+  url: z.string().url().describe('L\'URL à vérifier.'),
 });
 export type CheckLinkInput = z.infer<typeof CheckLinkInputSchema>;
 
 const CheckLinkOutputSchema = z.object({
   status: z
     .enum(['active', 'broken', 'error'])
-    .describe('The status of the link.'),
-  statusCode: z.number().optional().describe('The HTTP status code if available.'),
-  errorMessage: z.string().optional().describe('The error message if an error occurred.'),
+    .describe('Le statut du lien.'),
+  statusCode: z.number().optional().describe('Le code de statut HTTP si disponible.'),
+  errorMessage: z.string().optional().describe('Le message d\'erreur si une erreur s\'est produite.'),
 });
 export type CheckLinkOutput = z.infer<typeof CheckLinkOutputSchema>;
 
-// This is not a real flow that uses AI, but we wrap it in the flow structure
-// to keep the architecture consistent. It's a "tool" flow.
+// Ce flux utilise Genkit pour encapsuler la logique de vérification de lien
 const checkLinkFlow = ai.defineFlow(
   {
     name: 'checkLinkFlow',
     inputSchema: CheckLinkInputSchema,
     outputSchema: CheckLinkOutputSchema,
   },
-  async ({url}) => {
+  async (input) => {
+    const { url } = input;
     try {
-      // Use a HEAD request to be more efficient, we don't need the body.
-      // Set a timeout to avoid waiting forever.
+      // Utilisation d'une requête HEAD pour être plus efficace (pas de corps de réponse).
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // Timeout de 5 secondes
 
-      const response = await fetch(url, { method: 'HEAD', signal: controller.signal, redirect: 'follow' });
+      const response = await fetch(url, { 
+        method: 'HEAD', 
+        signal: controller.signal as any, // Cast pour éviter les conflits de types AbortSignal selon l'environnement
+        redirect: 'follow' 
+      });
       clearTimeout(timeoutId);
 
       if (response.status >= 200 && response.status < 400) {
-        // Any 2xx or 3xx status is considered active
+        // Tout statut 2xx ou 3xx est considéré comme actif
         return {
           status: 'active',
           statusCode: response.status,
         };
       } else {
-        // 4xx or 5xx status is considered broken
+        // Un statut 4xx ou 5xx est considéré comme cassé
         return {
           status: 'broken',
           statusCode: response.status,
         };
       }
     } catch (error: any) {
-      // Network errors, timeouts, etc.
+      // Erreurs réseau, timeouts, etc.
       if (error.name === 'AbortError') {
          return {
             status: 'error',
-            errorMessage: 'Timeout: The server took too long to respond.',
+            errorMessage: 'Délai d\'attente dépassé : le serveur a mis trop de temps à répondre.',
         };
       }
       return {
         status: 'error',
-        errorMessage: error.message || 'An unknown error occurred while fetching the URL.',
+        errorMessage: error.message || 'Une erreur inconnue est survenue lors de la vérification de l\'URL.',
       };
     }
   }
