@@ -7,31 +7,27 @@ service cloud.firestore {
       return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    // Accès aux documents d'administration (lecture seule pour le titulaire)
+    // Accès aux documents d'administration
     match /admins/{userId} {
       allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if false; // Seul un accès manuel via la console peut ajouter un admin
+      allow write: if false;
     }
 
     // Profils utilisateurs et sous-collections privées
     match /users/{userId} {
-      // Lecture autorisée pour tous les connectés (pour voir les noms d'affichage)
       allow read: if request.auth != null;
-      // Création et mise à jour uniquement par le propriétaire
       allow create, update: if request.auth != null && request.auth.uid == userId;
       
-      // Sous-collection Notes : Strictement privé au propriétaire
       match /notes/{noteId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Sous-collection Progress : Privé au propriétaire
       match /progress/{resourceId} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // Ressources, Parcours et Certifications : Lecture publique, Écriture Admin
+    // Ressources, Parcours et Certifications
     match /resources/{resourceId} {
       allow read: if request.auth != null;
       allow write: if isAdmin();
@@ -47,13 +43,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
     
-    // Feedback : Création par l'utilisateur, Gestion par l'Admin
+    // Feedback
     match /feedback/{feedbackId} {
         allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
         allow read, update, delete: if isAdmin();
     }
 
-    // Autorisation des requêtes de groupe de collection pour les administrateurs
+    // Espace Communautaire (Chat)
+    match /community_messages/{messageId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null 
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() <= 1000;
+    }
+
+    // Autorisation des requêtes de groupe de collection
     match /{path=**}/progress/{resourceId} {
       allow read: if isAdmin();
     }
