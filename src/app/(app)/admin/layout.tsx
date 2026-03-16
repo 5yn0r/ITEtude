@@ -149,12 +149,12 @@ function AdminLoginPage() {
   return (
       <main className="relative flex min-h-screen flex-col items-center justify-center bg-secondary/50 p-4">
         <div className="absolute top-4 left-4">
-             <ShadcnButton asChild variant="outline">
+             <Button asChild variant="outline">
                 <Link href="/dashboard">
                     <ArrowLeft className="mr-2 h-4 w-4" />
                     Retour au tableau de bord
                 </Link>
-            </ShadcnButton>
+            </Button>
         </div>
         <Link href="/" className="flex items-center gap-2 mb-6" aria-label="ITEtude Home">
             <Compass className="w-8 h-8 text-primary" />
@@ -166,14 +166,14 @@ function AdminLoginPage() {
             <CardDescription>Pour votre sécurité, veuillez vous authentifier à nouveau pour accéder au panneau d'administration.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-                <ShadcnButton 
+                <Button 
                     variant="outline" 
                     className="w-full bg-white text-gray-700 border-gray-300 hover:bg-gray-50 font-medium" 
                     onClick={handleGoogleSignIn}
                 >
                     <GoogleIcon />
                     S'authentifier avec Google
-                </ShadcnButton>
+                </Button>
                 <div className="relative">
                     <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
                     <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">Ou continuer avec</span></div>
@@ -192,7 +192,7 @@ function AdminLoginPage() {
                               {...field} 
                               className="pr-10"
                             />
-                            <ShadcnButton
+                            <Button
                               type="button"
                               variant="ghost"
                               size="icon"
@@ -204,15 +204,15 @@ function AdminLoginPage() {
                               ) : (
                                 <Eye className="h-4 w-4" />
                               )}
-                            </ShadcnButton>
+                            </Button>
                           </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <ShadcnButton type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                    <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                         {form.formState.isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Vérification...</> : "Accéder à l'administration"}
-                    </ShadcnButton>
+                    </Button>
                     </form>
                 </Form>
             </CardContent>
