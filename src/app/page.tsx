@@ -156,15 +156,15 @@ export default function LandingPage() {
             <div className="mt-20">
                 <div className="grid grid-cols-3 gap-4 text-center md:gap-8">
                     <div>
-                        <p className="text-5xl font-bold text-primary">200+</p>
+                        <p className="text-5xl font-bold text-primary">225+</p>
                         <p className="text-muted-foreground mt-2 font-semibold">Utilisateurs</p>
                     </div>
                     <div>
-                        <p className="text-5xl font-bold text-primary">30+</p>
+                        <p className="text-5xl font-bold text-primary">46+</p>
                         <p className="text-muted-foreground mt-2 font-semibold">Ressources</p>
                     </div>
                     <div>
-                        <p className="text-5xl font-bold text-primary">2+</p>
+                        <p className="text-5xl font-bold text-primary">5+</p>
                         <p className="text-muted-foreground mt-2 font-semibold">Parcours</p>
                     </div>
                 </div>
